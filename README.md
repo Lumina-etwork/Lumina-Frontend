@@ -1,27 +1,46 @@
-# Lumina Network — Frontend
+# Lumina Frontend
 
-Next.js web application for Lumina Network: blockchain-based vesting vault and token streaming infrastructure.
+Next.js web application for Lumina Network, providing a dashboard for managing vesting vaults, participating in veto-based governance proposals, and tracking token streams.
 
-## Features
+## Key Features
 
-- **Vesting Dashboard**: View and manage vesting schedules and token streams
-- **Governance**: Participate in governance proposals and veto voting
-- **Compliance**: KYC/AML verification and regulated asset support
-- **Cross-Chain Claims**: Claim vested tokens across multiple blockchain networks
-- **Analytics**: Real-time vesting analytics and historical tracking
+* **Vesting Vault Dashboard:** Interactive interface to view, track, and manage active vesting schedules and token streams.
+* **Governance Portal:** Real-time veto voting interface allowing beneficiaries to challenge and vote on admin-proposed governance actions.
+* **Analytics & Compliance:** Visual progress tracking, claim history analytics, and integrated KYC/AML compliance workflows.
 
 ## Tech Stack
 
-- [Next.js](https://nextjs.org/) — React framework
-- [TypeScript](https://www.typescriptlang.org/) — Type safety
-- [Tailwind CSS](https://tailwindcss.com/) — Styling
-- [Stellar Soroban](https://stellar.org/) — Smart contract integration
+* **Language/Framework:** Next.js (React) / TypeScript
+* **Styling:** Tailwind CSS
+* **Package Manager:** npm
 
 ## Getting Started
 
+### Prerequisites
+
+* Node.js 22 or higher
+* npm
+
+### Installation
+
 ```bash
+git clone https://github.com/ZuLu0890/Lumina-Frontend.git
+cd Lumina-Frontend
 npm install
+```
+
+### Local Development
+
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the app.
+### Production Build
+
+```bash
+npm run build
+```
+
+## Contributing
+
+Contributions are welcome. Please keep changes focused, verify the production build before opening a pull request, and open an issue first for major structural changes.
