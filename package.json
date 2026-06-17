@@ -4,17 +4,24 @@
   "private": true,
   "description": "Frontend for Lumina Network — blockchain-based vesting vault and token streaming on Stellar Soroban",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "analyze": "ANALYZE=true next build --webpack",
+    "check-bundle": "node scripts/check-bundle-size.mjs"
   },
   "dependencies": {
+    "d3-scale": "^4.0.2",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "recharts": "^3.8.1",
+    "soroban-client": "^1.0.1",
+    "stellar-sdk": "^13.3.0"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.9",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

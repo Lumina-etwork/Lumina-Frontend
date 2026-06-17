@@ -1,0 +1,26 @@
+name: Bundle Size Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  bundle-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: npm run build
+
+      - name: Analyze bundle size
+        run: |
+          node scripts/check-bundle-size.mjs
+
+      - name: Upload bundle stats
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-stats
+          path: .next/analyze
