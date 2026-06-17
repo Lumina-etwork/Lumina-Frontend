@@ -1,16 +1,5 @@
 import type { NextConfig } from "next";
 
-let bundleAnalyzer: ((config: NextConfig) => NextConfig) | null = null;
-
-if (process.env.ANALYZE === "true") {
-  try {
-    const mod = require("@next/bundle-analyzer");
-    bundleAnalyzer = mod.default({ enabled: true });
-  } catch {
-    console.warn("@next/bundle-analyzer not available. Skipping bundle analysis.");
-  }
-}
-
 const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["recharts", "d3-scale"],
@@ -51,4 +40,15 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default bundleAnalyzer ? bundleAnalyzer(nextConfig) : nextConfig;
+export default async function getConfig(): Promise<NextConfig> {
+  if (process.env.ANALYZE === "true") {
+    try {
+      const mod = await import("@next/bundle-analyzer");
+      const withAnalyzer = mod.default({ enabled: true });
+      return withAnalyzer(nextConfig);
+    } catch {
+      console.warn("@next/bundle-analyzer not available. Skipping bundle analysis.");
+    }
+  }
+  return nextConfig;
+}

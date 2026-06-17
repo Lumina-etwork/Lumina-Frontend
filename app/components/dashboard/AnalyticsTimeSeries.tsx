@@ -14,12 +14,12 @@ interface TimeSeriesProps {
 }
 
 export function AnalyticsTimeSeries({ title, color = "#3b82f6" }: TimeSeriesProps) {
-  const [Chart, setChart] = useState<React.ComponentType<any> | null>(null);
-  const [Line, setLine] = useState<React.ComponentType<any> | null>(null);
-  const [XAxis, setXAxis] = useState<React.ComponentType<any> | null>(null);
-  const [YAxis, setYAxis] = useState<React.ComponentType<any> | null>(null);
-  const [Tooltip, setTooltip] = useState<React.ComponentType<any> | null>(null);
-  const [ResponsiveContainer, setResponsiveContainer] = useState<React.ComponentType<any> | null>(null);
+  const [Chart, setChart] = useState<React.ElementType | null>(null);
+  const [Line, setLine] = useState<React.ElementType | null>(null);
+  const [XAxis, setXAxis] = useState<React.ElementType | null>(null);
+  const [YAxis, setYAxis] = useState<React.ElementType | null>(null);
+  const [Tooltip, setTooltip] = useState<React.ElementType | null>(null);
+  const [ResponsiveContainer, setResponsiveContainer] = useState<React.ElementType | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
