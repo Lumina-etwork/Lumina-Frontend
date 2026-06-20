@@ -6,7 +6,11 @@
  */
 
 import { decodeEvent, decodeEventBatch, RawSorobanEvent } from "./eventDecoder";
-import { resetPipeline, processEvent } from "../services/alertPipeline";
+import {
+  processEvent,
+  resetPipeline,
+  subscribeToAlerts,
+} from "../services/alertPipeline";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -68,8 +72,10 @@ function buildDataHex(fields: string[]): string {
 
 // ─── Known event fixtures ─────────────────────────────────────────────────────
 
-const BANDWIDTH_CONTRACT = "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSC4";
-const ESCROW_CONTRACT    = "CBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBSC4";
+const BANDWIDTH_CONTRACT =
+  "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSC4";
+const ESCROW_CONTRACT =
+  "CBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBSC4";
 
 const bandwidthAlertRaw: RawSorobanEvent = {
   contractId: BANDWIDTH_CONTRACT,
@@ -78,8 +84,8 @@ const bandwidthAlertRaw: RawSorobanEvent = {
     encodeString("node-42"),
   ]),
   dataHex: buildDataHex([
-    encodeU32(90),  // usagePercent
-    encodeU32(80),  // threshold
+    encodeU32(90), // usagePercent
+    encodeU32(80), // threshold
   ]),
   ledger: 1000,
   timestamp: 1_700_000_000_000,
@@ -92,7 +98,7 @@ const lowBalanceRaw: RawSorobanEvent = {
     encodeString("GX:account1"),
   ]),
   dataHex: buildDataHex([
-    encodeI128(500n),    // balance
+    encodeI128(500n), // balance
     encodeString("XLM"), // currency
   ]),
   ledger: 1001,
@@ -102,15 +108,15 @@ const lowBalanceRaw: RawSorobanEvent = {
 const unknownContractRaw: RawSorobanEvent = {
   contractId: "CUNKNOWNUNKNOWNUNKNOWNUNKNOWNUNKNOWNUNKNOWNUNKNOWNUNKNOWN",
   topicsHex: buildTopicsHex([encodeSymbol("SomeEvent")]),
-  dataHex:   buildDataHex([encodeU32(1)]),
+  dataHex: buildDataHex([encodeU32(1)]),
   ledger: 1002,
   timestamp: 1_700_000_002_000,
 };
 
 const malformedRaw: RawSorobanEvent = {
   contractId: BANDWIDTH_CONTRACT,
-  topicsHex: "ZZZZZZZZ",   // invalid hex
-  dataHex:   "ZZZZZZZZ",
+  topicsHex: "ZZZZZZZZ", // invalid hex
+  dataHex: "ZZZZZZZZ",
   ledger: 1003,
   timestamp: 1_700_000_003_000,
 };
@@ -212,7 +218,6 @@ describe("alertPipeline — deduplication", () => {
     const received: string[] = [];
     const decoded = decodeEvent(bandwidthAlertRaw)!;
 
-    const { subscribeToAlerts } = require("../services/alertPipeline");
     const unsub = subscribeToAlerts((a: { id: string }) => received.push(a.id));
 
     processEvent(decoded);
@@ -227,7 +232,6 @@ describe("alertPipeline — deduplication", () => {
     const received: string[] = [];
     const decoded = decodeEvent(bandwidthAlertRaw)!;
 
-    const { subscribeToAlerts } = require("../services/alertPipeline");
     const unsub = subscribeToAlerts((a: { id: string }) => received.push(a.id));
 
     processEvent(decoded);

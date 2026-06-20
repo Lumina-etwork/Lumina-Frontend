@@ -16,9 +16,7 @@ export function WalletConnector() {
     setLoading(true);
     setError(null);
     try {
-      const { loadCryptoSDK } = await import(
-        /* webpackChunkName: "vendors-crypto" */ "@/app/lib/dynamicImports"
-      );
+      const { loadCryptoSDK } = await import("@/app/lib/dynamicImports");
       const stellarSdk = await loadCryptoSDK();
       const Horizon = stellarSdk.Horizon ?? stellarSdk.default?.Horizon;
 

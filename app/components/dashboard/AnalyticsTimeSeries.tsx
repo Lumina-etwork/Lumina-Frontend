@@ -13,22 +13,24 @@ interface TimeSeriesProps {
   color?: string;
 }
 
-export function AnalyticsTimeSeries({ title, color = "#3b82f6" }: TimeSeriesProps) {
+export function AnalyticsTimeSeries({
+  title,
+  color = "#3b82f6",
+}: TimeSeriesProps) {
   const [Chart, setChart] = useState<React.ElementType | null>(null);
   const [Line, setLine] = useState<React.ElementType | null>(null);
   const [XAxis, setXAxis] = useState<React.ElementType | null>(null);
   const [YAxis, setYAxis] = useState<React.ElementType | null>(null);
   const [Tooltip, setTooltip] = useState<React.ElementType | null>(null);
-  const [ResponsiveContainer, setResponsiveContainer] = useState<React.ElementType | null>(null);
+  const [ResponsiveContainer, setResponsiveContainer] =
+    useState<React.ElementType | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const recharts = await import(
-          /* webpackChunkName: "vendors-charts" */ "recharts"
-        );
+        const recharts = await import("recharts");
         if (!cancelled) {
           setChart(() => recharts.LineChart);
           setLine(() => recharts.Line);
@@ -41,7 +43,9 @@ export function AnalyticsTimeSeries({ title, color = "#3b82f6" }: TimeSeriesProp
         if (!cancelled) setError("Failed to load chart library");
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const data: DataPoint[] = Array.from({ length: 24 }, (_, i) => ({
@@ -67,13 +71,21 @@ export function AnalyticsTimeSeries({ title, color = "#3b82f6" }: TimeSeriesProp
 
   return (
     <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
-      <h3 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+      <h3 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        {title}
+      </h3>
       <ResponsiveContainer width="100%" height={250}>
         <Chart data={data}>
           <XAxis dataKey="timestamp" stroke="#94a3b8" fontSize={11} />
           <YAxis stroke="#94a3b8" fontSize={11} />
           <Tooltip />
-          <Line type="monotone" dataKey="value" stroke={color} strokeWidth={2} dot={false} />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={2}
+            dot={false}
+          />
         </Chart>
       </ResponsiveContainer>
     </div>

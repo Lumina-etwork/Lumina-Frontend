@@ -1,6 +1,15 @@
 import { QueryClient } from "@tanstack/react-query";
 import { OptimisticTransactionManager } from "../OptimisticTransactionManager";
-import type { BalanceDelta, OptimisticSnapshot } from "../OptimisticTransactionManager";
+import type {
+  BalanceDelta,
+  OptimisticSnapshot,
+} from "../OptimisticTransactionManager";
+
+interface BalanceQueryData {
+  rawBalance: bigint;
+  balance: string;
+  formattedBalance: string;
+}
 
 // Mock sessionStorage
 const mockSessionStorage: Record<string, string> = {};
@@ -15,7 +24,9 @@ beforeAll(() => {
       delete mockSessionStorage[key];
     },
     clear: () => {
-      Object.keys(mockSessionStorage).forEach((key) => delete mockSessionStorage[key]);
+      Object.keys(mockSessionStorage).forEach(
+        (key) => delete mockSessionStorage[key],
+      );
     },
     length: 0,
     key: () => null,
@@ -23,7 +34,9 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  Object.keys(mockSessionStorage).forEach((key) => delete mockSessionStorage[key]);
+  Object.keys(mockSessionStorage).forEach(
+    (key) => delete mockSessionStorage[key],
+  );
 });
 
 describe("OptimisticTransactionManager", () => {
@@ -60,14 +73,18 @@ describe("OptimisticTransactionManager", () => {
       };
 
       const startTime = performance.now();
-      const nonce = manager.applyOptimisticUpdate(queryKey, delta, previousData);
+      const nonce = manager.applyOptimisticUpdate(
+        queryKey,
+        delta,
+        previousData,
+      );
       const elapsed = performance.now() - startTime;
 
       expect(elapsed).toBeLessThan(50);
       expect(nonce).toBeTruthy();
 
-      const updatedData: any = queryClient.getQueryData(queryKey);
-      expect(updatedData.rawBalance).toBe(6000000n);
+      const updatedData = queryClient.getQueryData<BalanceQueryData>(queryKey);
+      expect(updatedData?.rawBalance).toBe(6000000n);
     });
 
     it("should apply withdraw delta correctly", () => {
@@ -87,8 +104,8 @@ describe("OptimisticTransactionManager", () => {
 
       manager.applyOptimisticUpdate(queryKey, delta, previousData);
 
-      const updatedData: any = queryClient.getQueryData(queryKey);
-      expect(updatedData.rawBalance).toBe(7000000n);
+      const updatedData = queryClient.getQueryData<BalanceQueryData>(queryKey);
+      expect(updatedData?.rawBalance).toBe(7000000n);
     });
 
     it("should handle negative balance after withdraw", () => {
@@ -108,8 +125,8 @@ describe("OptimisticTransactionManager", () => {
 
       manager.applyOptimisticUpdate(queryKey, delta, previousData);
 
-      const updatedData: any = queryClient.getQueryData(queryKey);
-      expect(updatedData.rawBalance).toBe(-4000000n);
+      const updatedData = queryClient.getQueryData<BalanceQueryData>(queryKey);
+      expect(updatedData?.rawBalance).toBe(-4000000n);
     });
   });
 
@@ -226,8 +243,9 @@ describe("OptimisticTransactionManager", () => {
 
       expect(elapsed).toBeLessThan(200);
 
-      const rolledBackData: any = queryClient.getQueryData(queryKey);
-      expect(rolledBackData.rawBalance).toBe(1000000n);
+      const rolledBackData =
+        queryClient.getQueryData<BalanceQueryData>(queryKey);
+      expect(rolledBackData?.rawBalance).toBe(1000000n);
     });
 
     it("should remove snapshot after rollback", () => {
@@ -248,7 +266,11 @@ describe("OptimisticTransactionManager", () => {
       manager.persistSnapshot(snapshot);
       expect(manager.loadSnapshots()).toHaveLength(1);
 
-      manager.rollbackOptimisticUpdate(queryKey, previousData, "rollback-nonce");
+      manager.rollbackOptimisticUpdate(
+        queryKey,
+        previousData,
+        "rollback-nonce",
+      );
 
       expect(manager.loadSnapshots()).toHaveLength(0);
     });
@@ -280,7 +302,7 @@ describe("OptimisticTransactionManager", () => {
   describe("reconcileOrphanedSnapshots", () => {
     it("should reconcile orphaned snapshots with backend data", async () => {
       const queryKey = ["balance", "test"];
-      
+
       const snapshot: OptimisticSnapshot = {
         nonce: "orphan-nonce",
         queryKey,
@@ -304,12 +326,13 @@ describe("OptimisticTransactionManager", () => {
         formattedBalance: "0.6",
       });
 
-      const reconciled = await manager.reconcileOrphanedSnapshots(backendFetcher);
+      const reconciled =
+        await manager.reconcileOrphanedSnapshots(backendFetcher);
 
       expect(reconciled).toBe(1);
 
-      const updatedData: any = queryClient.getQueryData(queryKey);
-      expect(updatedData.rawBalance).toBe(3000000n);
+      const updatedData = queryClient.getQueryData<BalanceQueryData>(queryKey);
+      expect(updatedData?.rawBalance).toBe(3000000n);
 
       expect(manager.loadSnapshots()).toHaveLength(0);
     });

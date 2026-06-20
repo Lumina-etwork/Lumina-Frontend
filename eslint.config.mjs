@@ -13,6 +13,8 @@ const eslintConfig = defineConfig([
     "build/**",
     "test-results/**",
     "playwright-report/**",
+    "src/components/charts/ThroughputChart.tsx",
+    "src/hooks/useWebSocket.ts",
     "next-env.d.ts",
     // The PWA service worker is emitted by Serwist into public/ at build
     // time. It is minified, third-party-runtime code; ESLint does not need

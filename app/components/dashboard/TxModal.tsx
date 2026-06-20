@@ -8,9 +8,7 @@ export function TxModal({ txHash }: { txHash?: string }) {
 
   const handleConfirm = useCallback(async () => {
     setConfirming(true);
-    const { loadCryptoSDK } = await import(
-      /* webpackChunkName: "vendors-crypto" */ "@/app/lib/dynamicImports"
-    );
+    const { loadCryptoSDK } = await import("@/app/lib/dynamicImports");
     await loadCryptoSDK();
     setConfirming(false);
     setIsOpen(false);

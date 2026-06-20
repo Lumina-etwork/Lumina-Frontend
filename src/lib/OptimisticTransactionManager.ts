@@ -28,6 +28,17 @@ export interface TransactionParams {
   txXdr: string;
 }
 
+interface BalanceQueryData {
+  rawBalance: bigint;
+  balance: string;
+  formattedBalance: string;
+  [key: string]: unknown;
+}
+
+function isBalanceQueryData(value: unknown): value is BalanceQueryData {
+  return typeof value === "object" && value !== null && "rawBalance" in value;
+}
+
 const STORAGE_KEY = "lumina-optimistic-snapshots";
 const STORAGE_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
 const SUBMIT_DEBOUNCE_MS = 50;
@@ -46,14 +57,14 @@ export class OptimisticTransactionManager {
   applyOptimisticUpdate(
     queryKey: unknown[],
     delta: BalanceDelta,
-    previousData: unknown
+    previousData: unknown,
   ): string {
     const nonce = generateIdempotencyKey();
     const startTime = performance.now();
 
     // Apply the balance delta immediately
-    this.queryClient.setQueryData(queryKey, (old: any) => {
-      if (!old) return old;
+    this.queryClient.setQueryData(queryKey, (old: unknown) => {
+      if (!isBalanceQueryData(old)) return old;
 
       const newBalance =
         delta.operation === "deposit"
@@ -70,7 +81,9 @@ export class OptimisticTransactionManager {
 
     const elapsed = performance.now() - startTime;
     if (elapsed > SUBMIT_DEBOUNCE_MS) {
-      console.warn(`Optimistic update took ${elapsed.toFixed(2)}ms (target: <${SUBMIT_DEBOUNCE_MS}ms)`);
+      console.warn(
+        `Optimistic update took ${elapsed.toFixed(2)}ms (target: <${SUBMIT_DEBOUNCE_MS}ms)`,
+      );
     }
 
     return nonce;
@@ -98,11 +111,11 @@ export class OptimisticTransactionManager {
       if (!raw) return [];
 
       const snapshots = JSON.parse(raw) as OptimisticSnapshot[];
-      
+
       // Filter out expired snapshots
       const now = Date.now();
       const valid = snapshots.filter(
-        (s) => now - s.timestamp < STORAGE_EXPIRY_MS
+        (s) => now - s.timestamp < STORAGE_EXPIRY_MS,
       );
 
       if (valid.length !== snapshots.length) {
@@ -134,7 +147,7 @@ export class OptimisticTransactionManager {
   rollbackOptimisticUpdate(
     queryKey: unknown[],
     previousData: unknown,
-    nonce: string
+    nonce: string,
   ): void {
     const startTime = performance.now();
 
@@ -176,7 +189,7 @@ export class OptimisticTransactionManager {
    * Reconcile orphaned optimistic entries on mount
    */
   async reconcileOrphanedSnapshots(
-    backendBalanceFetcher: () => Promise<{ rawBalance: bigint }>
+    backendBalanceFetcher: () => Promise<{ rawBalance: bigint }>,
   ): Promise<number> {
     const snapshots = this.loadSnapshots();
     if (snapshots.length === 0) return 0;
@@ -184,11 +197,11 @@ export class OptimisticTransactionManager {
     try {
       // Fetch the actual backend balance
       const backendData = await backendBalanceFetcher();
-      
+
       // For each snapshot, check if it should be rolled back
       for (const snapshot of snapshots) {
-        this.queryClient.setQueryData(snapshot.queryKey, (current: any) => {
-          if (!current) return current;
+        this.queryClient.setQueryData(snapshot.queryKey, (current: unknown) => {
+          if (!isBalanceQueryData(current)) return current;
 
           // If current balance doesn't match backend, use backend value
           return {
@@ -228,11 +241,10 @@ export class OptimisticTransactionManager {
     const divisor = 10n ** BigInt(decimals);
     const integerPart = balance / divisor;
     const fractionalPart = balance % divisor;
-    
-    const fractionalStr = fractionalPart
-      .toString()
-      .padStart(decimals, "0")
-      .replace(/0+$/, "") || "0";
+
+    const fractionalStr =
+      fractionalPart.toString().padStart(decimals, "0").replace(/0+$/, "") ||
+      "0";
 
     return `${integerPart}.${fractionalStr}`;
   }
