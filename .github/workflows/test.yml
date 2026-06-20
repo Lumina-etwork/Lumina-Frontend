@@ -15,8 +15,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "22"
-      - run: npm install
-      - run: node scripts/check-contrast.mjs
+      - run: npm ci
       - run: npm run build
       - run: npx playwright install chromium --with-deps
       - run: npx playwright test
@@ -31,7 +30,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "22"
-      - run: npm install
+      - run: npm ci
       - run: npm run lint
 
   lazy-loading-test:
@@ -42,7 +41,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "22"
-      - run: npm install
+      - run: npm ci
       - name: Test lazy route chunk isolation
         run: |
           npm run build

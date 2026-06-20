@@ -98,6 +98,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     }
   }, [handleAccountChange]);
 
+  useEffect(() => {
+    void connect();
+  }, [connect]);
+
   const disconnect = useCallback(() => {
     transitioningRef.current = true;
     setIsTransitioning(true);
@@ -123,9 +127,5 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     [publicKey, generation, isTransitioning, connect, disconnect],
   );
 
-  return (
-    <WalletContext value={value}>
-      {children}
-    </WalletContext>
-  );
+  return <WalletContext value={value}>{children}</WalletContext>;
 }
