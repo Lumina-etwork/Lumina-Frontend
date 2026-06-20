@@ -23,6 +23,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const blockingScript = `
+    (function(){try{var t=localStorage.getItem("lumina-theme");if(t==="solar"||t==="dark"){document.documentElement.classList.add(t)}}catch(e){}})();
+  `;
+
   return (
     <html lang="en" className="dark">
       <body
