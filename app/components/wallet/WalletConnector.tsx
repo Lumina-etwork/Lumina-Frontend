@@ -16,13 +16,17 @@ export function WalletConnector() {
     setLoading(true);
     setError(null);
     try {
-      const { loadCryptoSDK, loadSorobanClient } = await import(
+      const { loadCryptoSDK } = await import(
         /* webpackChunkName: "vendors-crypto" */ "@/app/lib/dynamicImports"
       );
-      const StellarSdk = await loadCryptoSDK();
-      await loadSorobanClient();
+      const stellarSdk = await loadCryptoSDK();
+      const Horizon = stellarSdk.Horizon ?? stellarSdk.default?.Horizon;
 
-      const server = new StellarSdk.Horizon.Server("https://horizon-testnet.stellar.org");
+      if (!Horizon?.Server) {
+        throw new Error("Failed to load Stellar SDK");
+      }
+
+      const server = new Horizon.Server("https://horizon-testnet.stellar.org");
       const account = await server.loadAccount("GABCDEF1234567890EXAMPLE");
       setWallet({
         address: account.id,

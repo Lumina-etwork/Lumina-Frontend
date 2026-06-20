@@ -38,7 +38,9 @@ function ErrorRow({ symbol, message }: { symbol: string; message: string }) {
       role="alert"
     >
       <div className="flex items-center gap-3">
-        <span className="text-rose-600" aria-hidden="true">!</span>
+        <span className="text-rose-600" aria-hidden="true">
+          !
+        </span>
         <span className="text-sm font-medium text-rose-800">{symbol}</span>
       </div>
       <span className="text-xs text-rose-600">{message}</span>
@@ -55,13 +57,13 @@ export function TokenBalanceRow({
   locale,
   loading = false,
 }: TokenBalanceRowProps) {
+  const balance = useFormattedBalance(stroopBalance, decimals, locale);
+
   if (loading) return <LoadingSkeleton />;
 
   if (stroopBalance == null) {
     return <ErrorRow symbol={symbol} message="Balance unavailable" />;
   }
-
-  const balance = useFormattedBalance(stroopBalance, decimals, locale);
 
   let usdDisplay: string | null = null;
   if (usdValue != null && balance.raw !== 0n) {

@@ -69,7 +69,6 @@ export function formatStroop(
   if (remainder === 0n) return prefix + formattedInt;
   let decStr = remainder.toString().padStart(decimals, "0");
   decStr = decStr.replace(/0+$/, "");
-  const significant = decStr.length;
   return prefix + formattedInt + "." + decStr;
 }
 
@@ -84,7 +83,9 @@ export function add(a: bigint, b: bigint): bigint {
 export function sub(a: bigint, b: bigint): bigint {
   const result = a - b;
   if (result > MAX_STROOP || result < -MAX_STROOP) {
-    throw new Error("Overflow: subtraction exceeds maximum allowed stroop amount");
+    throw new Error(
+      "Overflow: subtraction exceeds maximum allowed stroop amount",
+    );
   }
   return result;
 }
@@ -92,7 +93,9 @@ export function sub(a: bigint, b: bigint): bigint {
 export function mul(a: bigint, b: bigint): bigint {
   const result = a * b;
   if (result > MAX_STROOP || result < -MAX_STROOP) {
-    throw new Error("Overflow: multiplication exceeds maximum allowed stroop amount");
+    throw new Error(
+      "Overflow: multiplication exceeds maximum allowed stroop amount",
+    );
   }
   return result;
 }

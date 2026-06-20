@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
             reuseExistingChunk: true,
           },
           "vendors-crypto": {
-            test: /[\\/]node_modules[\\/](stellar-sdk|soroban-client|stellar-base|sodium-native|sodium-universal|tweetnacl|axios|urijs|eventsource)[\\/]/,
+            test: /[\\/]node_modules[\\/](?:@stellar[\\/](?:stellar-sdk|stellar-base)|stellar-sdk|soroban-client|stellar-base|sodium-native|sodium-universal|tweetnacl|axios|urijs|eventsource|randombytes)[\\/]/,
             name: "vendors-crypto",
             chunks: "all",
             priority: 30,
@@ -58,14 +58,19 @@ const nextConfig: NextConfig = {
 };
 
 export default async function getConfig(): Promise<NextConfig> {
+  const config = withSerwist(nextConfig);
+
   if (process.env.ANALYZE === "true") {
     try {
       const mod = await import("@next/bundle-analyzer");
       const withAnalyzer = mod.default({ enabled: true });
-      return withAnalyzer(nextConfig);
+      return withAnalyzer(config);
     } catch {
-      console.warn("@next/bundle-analyzer not available. Skipping bundle analysis.");
+      console.warn(
+        "@next/bundle-analyzer not available. Skipping bundle analysis.",
+      );
     }
   }
-  return nextConfig;
+
+  return config;
 }

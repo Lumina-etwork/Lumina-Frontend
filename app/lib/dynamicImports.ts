@@ -7,11 +7,9 @@ export function loadD3Scale() {
 }
 
 export function loadCryptoSDK() {
-  return import(/* webpackChunkName: "vendors-crypto" */ "stellar-sdk");
-}
-
-export function loadSorobanClient() {
-  return import(/* webpackChunkName: "vendors-crypto" */ "soroban-client");
+  return import(
+    /* webpackChunkName: "vendors-crypto" */ "@stellar/stellar-sdk"
+  );
 }
 
 export const CRYPTO_CHUNK = "vendors-crypto";

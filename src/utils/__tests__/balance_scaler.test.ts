@@ -14,7 +14,7 @@ import {
 import { StroopConverter, STROOP_DECIMALS } from "../balance_scaler";
 
 let passed = 0;
-let failed: string[] = [];
+const failed: string[] = [];
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -95,8 +95,16 @@ assertEq(fromStroop(10n, 7), "0.000001", "10 stroops to string");
 assertBigInt(toStroop("1000000000000", 7), 10000000000000000000n, "1e12 XLM");
 assertBigInt(toStroop("1000000000", 7), 10000000000000000n, "1e9 XLM");
 assertBigInt(toStroop("1000000", 7), 10000000000000n, "1e6 XLM");
-assertBigInt(toStroop("1000000000000", 0), 1000000000000n, "1e12 with 0 decimals");
-assertEq(fromStroop(10000000000000000000n, 7), "1000000000000", "round-trip large");
+assertBigInt(
+  toStroop("1000000000000", 0),
+  1000000000000n,
+  "1e12 with 0 decimals",
+);
+assertEq(
+  fromStroop(10000000000000000000n, 7),
+  "1000000000000",
+  "round-trip large",
+);
 
 // ============================================================
 // 6. Zero and negative values
@@ -160,7 +168,11 @@ assertBigInt(div(10n, 3n, RoundingMode.HALF_UP), 3n, "div 10/3 HALF_UP = 3");
 assertBigInt(div(10n, 3n, RoundingMode.DOWN), 3n, "div 10/3 DOWN = 3");
 assertBigInt(div(10n, 3n, RoundingMode.UP), 4n, "div 10/3 UP = 4");
 assertBigInt(div(11n, 3n, RoundingMode.HALF_UP), 4n, "div 11/3 HALF_UP = 4");
-assertBigInt(div(9n, 3n, RoundingMode.HALF_UP), 3n, "div 9/3 HALF_UP = 3 (exact)");
+assertBigInt(
+  div(9n, 3n, RoundingMode.HALF_UP),
+  3n,
+  "div 9/3 HALF_UP = 3 (exact)",
+);
 assertBigInt(div(7n, 3n, RoundingMode.HALF_UP), 2n, "div 7/3 HALF_UP = 2");
 assertBigInt(div(8n, 3n, RoundingMode.HALF_UP), 3n, "div 8/3 HALF_UP = 3");
 assertBigInt(div(5n, 2n, RoundingMode.HALF_UP), 3n, "div 5/2 HALF_UP = 3");
@@ -168,10 +180,18 @@ assertBigInt(div(5n, 2n, RoundingMode.DOWN), 2n, "div 5/2 DOWN = 2");
 assertBigInt(div(5n, 2n, RoundingMode.UP), 3n, "div 5/2 UP = 3");
 
 // Negative division
-assertBigInt(div(-10n, 3n, RoundingMode.HALF_UP), -3n, "div -10/3 HALF_UP = -3");
+assertBigInt(
+  div(-10n, 3n, RoundingMode.HALF_UP),
+  -3n,
+  "div -10/3 HALF_UP = -3",
+);
 assertBigInt(div(-10n, 3n, RoundingMode.DOWN), -3n, "div -10/3 DOWN = -3");
 assertBigInt(div(-10n, 3n, RoundingMode.UP), -4n, "div -10/3 UP = -4");
-assertBigInt(div(-11n, 3n, RoundingMode.HALF_UP), -4n, "div -11/3 HALF_UP = -4");
+assertBigInt(
+  div(-11n, 3n, RoundingMode.HALF_UP),
+  -4n,
+  "div -11/3 HALF_UP = -4",
+);
 assertBigInt(div(-7n, 3n, RoundingMode.HALF_UP), -2n, "div -7/3 HALF_UP = -2");
 assertBigInt(div(-8n, 3n, RoundingMode.HALF_UP), -3n, "div -8/3 HALF_UP = -3");
 assertBigInt(div(-5n, 2n, RoundingMode.HALF_UP), -3n, "div -5/2 HALF_UP = -3");
@@ -229,7 +249,11 @@ assertBigInt(toStroop("1", 0), 1n, "1 with 0 decimals");
 assertBigInt(toStroop("1", 1), 10n, "1 with 1 decimal");
 assertBigInt(toStroop("1", 2), 100n, "1 with 2 decimals");
 assertBigInt(toStroop("1", 3), 1000n, "1 with 3 decimals");
-assertBigInt(toStroop("1", 18), BigInt("1" + "0".repeat(18)), "1 with 18 decimals");
+assertBigInt(
+  toStroop("1", 18),
+  BigInt("1" + "0".repeat(18)),
+  "1 with 18 decimals",
+);
 assertBigInt(toStroop("0.5", 1), 5n, "0.5 with 1 decimal");
 assertBigInt(toStroop("0.05", 2), 5n, "0.05 with 2 decimals");
 assertBigInt(toStroop("0.005", 3), 5n, "0.005 with 3 decimals");
@@ -250,11 +274,7 @@ assertBigInt(
   10000000n,
   "fromBlockchain string 10M",
 );
-assertBigInt(
-  StroopConverter.fromBlockchain("0x0"),
-  0n,
-  "fromBlockchain hex 0",
-);
+assertBigInt(StroopConverter.fromBlockchain("0x0"), 0n, "fromBlockchain hex 0");
 assertBigInt(
   StroopConverter.fromBlockchain("0xFF"),
   255n,
@@ -307,16 +327,8 @@ assertEq(
   "1",
   "toHumanReadable 10M = 1",
 );
-assertEq(
-  StroopConverter.toHumanReadable(1n),
-  "0.0000001",
-  "toHumanReadable 1",
-);
-assertEq(
-  StroopConverter.toHumanReadable(0n),
-  "0",
-  "toHumanReadable 0",
-);
+assertEq(StroopConverter.toHumanReadable(1n), "0.0000001", "toHumanReadable 1");
+assertEq(StroopConverter.toHumanReadable(0n), "0", "toHumanReadable 0");
 
 // ============================================================
 // 15. serializeForCacheKey / parseCacheKey
@@ -332,12 +344,20 @@ assertBigInt(StroopConverter.parseCacheKey("0"), 0n, "parseCacheKey zero");
 
 const keyNeg = StroopConverter.serializeForCacheKey(-1n);
 assertEq(keyNeg, "-1", "serializeForCacheKey negative");
-assertBigInt(StroopConverter.parseCacheKey("-1"), -1n, "parseCacheKey negative");
+assertBigInt(
+  StroopConverter.parseCacheKey("-1"),
+  -1n,
+  "parseCacheKey negative",
+);
 
 // ============================================================
 // 16. Edge-case: very small fractions beyond precision
 // ============================================================
-assertBigInt(toStroop("0.000000100", 7), 1n, "0.000000100 trimmed to 0.0000001");
+assertBigInt(
+  toStroop("0.000000100", 7),
+  1n,
+  "0.000000100 trimmed to 0.0000001",
+);
 assertBigInt(toStroop("0.0000001000", 7), 1n, "0.0000001000 trimmed");
 assertBigInt(toStroop("0.00000015", 7), 1n, "0.00000015 truncated to 1 stroop");
 
@@ -351,8 +371,16 @@ assertBigInt(toStroop("00.00", 7), 0n, "00.00 = 0");
 // ============================================================
 // 18. Edge-case: large decimals
 // ============================================================
-assertBigInt(toStroop("1", 18), BigInt("1" + "0".repeat(18)), "1 eth-like 18 dec");
-assertEq(fromStroop(BigInt("1" + "0".repeat(18)), 18), "1", "round-trip 18 dec");
+assertBigInt(
+  toStroop("1", 18),
+  BigInt("1" + "0".repeat(18)),
+  "1 eth-like 18 dec",
+);
+assertEq(
+  fromStroop(BigInt("1" + "0".repeat(18)), 18),
+  "1",
+  "round-trip 18 dec",
+);
 assertEq(fromStroop(1n, 18), "0.000000000000000001", "1 wei to eth string");
 
 // ============================================================
@@ -373,7 +401,11 @@ assertEq(fromStroop(11110000n, 7), "1.111", "11.11M stroops = 1.111");
 assertEq(fromStroop(11111000n, 7), "1.1111", "11.111M stroops = 1.1111");
 assertEq(fromStroop(11111100n, 7), "1.11111", "11.1111M stroops = 1.11111");
 assertEq(fromStroop(11111110n, 7), "1.111111", "11.11111M stroops = 1.111111");
-assertEq(fromStroop(11111111n, 7), "1.1111111", "11.111111M stroops = 1.1111111");
+assertEq(
+  fromStroop(11111111n, 7),
+  "1.1111111",
+  "11.111111M stroops = 1.1111111",
+);
 
 // ============================================================
 // 20. Large number division
@@ -413,7 +445,10 @@ assertBigInt(toStroop("100", 7), 1000000000n, "boundary: 100");
 // ============================================================
 assert(isNegative(-10000000000000000000n), "isNegative large negative");
 assert(!isNegative(0n), "isNegative not negative for 0");
-assert(!isNegative(10000000000000000000n), "isNegative not negative for large positive");
+assert(
+  !isNegative(10000000000000000000n),
+  "isNegative not negative for large positive",
+);
 assertEq(compare(-1n, -1n), 0, "compare -1,-1 = 0");
 assertEq(compare(-1n, -2n), 1, "compare -1,-2 = 1 (less negative)");
 assertEq(compare(-2n, -1n), -1, "compare -2,-1 = -1 (more negative)");
@@ -451,12 +486,19 @@ assertEq(STROOP_DECIMALS, 7, "STROOP_DECIMALS is 7");
 // 26. Locale-specific formatting details
 // ============================================================
 const enFormatted = formatStroop(1000000000n, 0, "en-US");
-assert(!enFormatted.includes(",") || enFormatted.includes("1,000,000,000"), "en-US uses comma separators");
+assert(
+  !enFormatted.includes(",") || enFormatted.includes("1,000,000,000"),
+  "en-US uses comma separators",
+);
 
 // ============================================================
 // 27. Decimal formatting with significant trailing zero removal
 // ============================================================
-assertEq(fromStroop(10000001n, 7), "1.0000001", "trailing zeros preserved in middle");
+assertEq(
+  fromStroop(10000001n, 7),
+  "1.0000001",
+  "trailing zeros preserved in middle",
+);
 assertEq(fromStroop(10000010n, 7), "1.000001", "one trailing zero removed");
 assertEq(fromStroop(10000100n, 7), "1.00001", "two trailing zeros removed");
 assertEq(fromStroop(10001000n, 7), "1.0001", "three trailing zeros removed");
@@ -471,18 +513,30 @@ assertEq(fromStroop(-1n, 7), "-0.0000001", "negative 1 stroop formatted");
 assertEq(fromStroop(-10000000n, 7), "-1", "negative 1 XLM formatted");
 assertEq(fromStroop(-11000000n, 7), "-1.1", "negative 1.1 XLM");
 assertEq(fromStroop(-12345678n, 7), "-1.2345678", "negative complex value");
-assertBigInt(toStroop("-1000.0000001", 7), -10000000001n, "negative with decimals");
+assertBigInt(
+  toStroop("-1000.0000001", 7),
+  -10000000001n,
+  "negative with decimals",
+);
 
 // ============================================================
 // 29. HALF_UP at exact boundaries
 // ============================================================
 assertBigInt(div(3n, 2n, RoundingMode.HALF_UP), 2n, "3/2 HALF_UP = 2");
-assertBigInt(div(1n, 2n, RoundingMode.HALF_UP), 1n, "1/2 HALF_UP = 1 (half rounds up)");
+assertBigInt(
+  div(1n, 2n, RoundingMode.HALF_UP),
+  1n,
+  "1/2 HALF_UP = 1 (half rounds up)",
+);
 assertBigInt(div(2n, 2n, RoundingMode.HALF_UP), 1n, "2/2 HALF_UP = 1 (exact)");
 assertBigInt(div(4n, 2n, RoundingMode.HALF_UP), 2n, "4/2 HALF_UP = 2 (exact)");
 assertBigInt(div(99n, 100n, RoundingMode.HALF_UP), 1n, "99/100 HALF_UP = 1");
 assertBigInt(div(49n, 100n, RoundingMode.HALF_UP), 0n, "49/100 HALF_UP = 0");
-assertBigInt(div(50n, 100n, RoundingMode.HALF_UP), 1n, "50/100 HALF_UP = 1 (tie breaks up)");
+assertBigInt(
+  div(50n, 100n, RoundingMode.HALF_UP),
+  1n,
+  "50/100 HALF_UP = 1 (tie breaks up)",
+);
 assertBigInt(div(51n, 100n, RoundingMode.HALF_UP), 1n, "51/100 HALF_UP = 1");
 
 // ============================================================
@@ -490,11 +544,27 @@ assertBigInt(div(51n, 100n, RoundingMode.HALF_UP), 1n, "51/100 HALF_UP = 1");
 // ============================================================
 assertBigInt(div(-3n, 2n, RoundingMode.HALF_UP), -2n, "-3/2 HALF_UP = -2");
 assertBigInt(div(-1n, 2n, RoundingMode.HALF_UP), -1n, "-1/2 HALF_UP = -1");
-assertBigInt(div(-2n, 2n, RoundingMode.HALF_UP), -1n, "-2/2 HALF_UP = -1 (exact)");
-assertBigInt(div(-99n, 100n, RoundingMode.HALF_UP), -1n, "-99/100 HALF_UP = -1");
+assertBigInt(
+  div(-2n, 2n, RoundingMode.HALF_UP),
+  -1n,
+  "-2/2 HALF_UP = -1 (exact)",
+);
+assertBigInt(
+  div(-99n, 100n, RoundingMode.HALF_UP),
+  -1n,
+  "-99/100 HALF_UP = -1",
+);
 assertBigInt(div(-49n, 100n, RoundingMode.HALF_UP), 0n, "-49/100 HALF_UP = 0");
-assertBigInt(div(-50n, 100n, RoundingMode.HALF_UP), -1n, "-50/100 HALF_UP = -1");
-assertBigInt(div(-51n, 100n, RoundingMode.HALF_UP), -1n, "-51/100 HALF_UP = -1");
+assertBigInt(
+  div(-50n, 100n, RoundingMode.HALF_UP),
+  -1n,
+  "-50/100 HALF_UP = -1",
+);
+assertBigInt(
+  div(-51n, 100n, RoundingMode.HALF_UP),
+  -1n,
+  "-51/100 HALF_UP = -1",
+);
 
 // ============================================================
 // 31. Whole-number formatting edge cases
@@ -514,8 +584,7 @@ assert(localeEn.includes("1,234"), `en-US grouping: "${localeEn}"`);
 
 const localeDe = formatStroop(12340000000n, 7, "de-DE");
 assert(
-  (localeDe.includes(".") && !localeDe.includes(",")) ||
-  localeDe === "1234",
+  (localeDe.includes(".") && !localeDe.includes(",")) || localeDe === "1234",
   `de-DE format (dots not commas): "${localeDe}"`,
 );
 
@@ -524,7 +593,11 @@ assert(
 // ============================================================
 assertBigInt(toStroop("42", 7), 420000000n, "no decimal point in input");
 assertBigInt(toStroop("0", 7), 0n, "zero no decimal");
-assertBigInt(toStroop("1000000000000", 7), 10000000000000000000n, "large no decimal");
+assertBigInt(
+  toStroop("1000000000000", 7),
+  10000000000000000000n,
+  "large no decimal",
+);
 
 // ============================================================
 // 34. Empty or edge-case decimal parts in toStroop
@@ -537,14 +610,30 @@ assertBigInt(toStroop("1.0000000", 7), 10000000n, "1.0000000 = 10M stroops");
 // ============================================================
 // 35. Multiple decimal points (invalid - should use first)
 // ============================================================
-assertBigInt(toStroop("1.2.3", 7), 12000000n, "multiple dots uses first segment");
+assertBigInt(
+  toStroop("1.2.3", 7),
+  12000000n,
+  "multiple dots uses first segment",
+);
 
 // ============================================================
 // 36. compare with large values
 // ============================================================
-assertEq(compare(BigInt("9999999999999999999"), BigInt("10000000000000000000")), -1, "compare large lt");
-assertEq(compare(BigInt("10000000000000000000"), BigInt("9999999999999999999")), 1, "compare large gt");
-assertEq(compare(BigInt("10000000000000000000"), BigInt("10000000000000000000")), 0, "compare large eq");
+assertEq(
+  compare(BigInt("9999999999999999999"), BigInt("10000000000000000000")),
+  -1,
+  "compare large lt",
+);
+assertEq(
+  compare(BigInt("10000000000000000000"), BigInt("9999999999999999999")),
+  1,
+  "compare large gt",
+);
+assertEq(
+  compare(BigInt("10000000000000000000"), BigInt("10000000000000000000")),
+  0,
+  "compare large eq",
+);
 
 // ============================================================
 // 37. fromStroop with varying decimals
@@ -563,19 +652,43 @@ assertEq(fromStroop(1n, 7), "0.0000001", "fromStroop 1 dec 7 = 0.0000001");
 // 38. add and sub edge cases
 // ============================================================
 assertBigInt(add(0n, 0n), 0n, "add zero+zero");
-assertBigInt(add(BigInt("99999999999999999999"), 0n), BigInt("99999999999999999999"), "add large+zero");
+assertBigInt(
+  add(BigInt("99999999999999999999"), 0n),
+  BigInt("99999999999999999999"),
+  "add large+zero",
+);
 assertBigInt(sub(0n, 0n), 0n, "sub zero-zero");
-assertBigInt(sub(BigInt("99999999999999999999"), 0n), BigInt("99999999999999999999"), "sub large-zero");
-assertBigInt(sub(0n, BigInt("99999999999999999999")), BigInt("-99999999999999999999"), "sub zero-large = negative");
+assertBigInt(
+  sub(BigInt("99999999999999999999"), 0n),
+  BigInt("99999999999999999999"),
+  "sub large-zero",
+);
+assertBigInt(
+  sub(0n, BigInt("99999999999999999999")),
+  BigInt("-99999999999999999999"),
+  "sub zero-large = negative",
+);
 
 // ============================================================
 // 39. fromBlockchain with different number bases
 // ============================================================
 assertBigInt(StroopConverter.fromBlockchain("0x10"), 16n, "hex 0x10 = 16");
 assertBigInt(StroopConverter.fromBlockchain("0X10"), 16n, "hex 0X10 = 16");
-assertBigInt(StroopConverter.fromBlockchain("0x7FFFFFFFFFFFFFFF"), BigInt("0x7FFFFFFFFFFFFFFF"), "max safe hex");
-assertBigInt(StroopConverter.fromBlockchain(" 100 "), 100n, "whitespace trimmed");
-assertBigInt(StroopConverter.fromBlockchain(" -5 "), -5n, "negative with whitespace");
+assertBigInt(
+  StroopConverter.fromBlockchain("0x7FFFFFFFFFFFFFFF"),
+  BigInt("0x7FFFFFFFFFFFFFFF"),
+  "max safe hex",
+);
+assertBigInt(
+  StroopConverter.fromBlockchain(" 100 "),
+  100n,
+  "whitespace trimmed",
+);
+assertBigInt(
+  StroopConverter.fromBlockchain(" -5 "),
+  -5n,
+  "negative with whitespace",
+);
 
 // ============================================================
 // 40. Negative rounding with DOWN and UP modes
