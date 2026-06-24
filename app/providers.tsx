@@ -9,6 +9,12 @@ import { WalletStatusBar } from "@/src/components/shared/WalletStatusBar";
 import { ThemeProvider } from "@/src/components/providers/ThemeProvider";
 import { useOfflineSync, OfflineSyncContext } from "@/src/hooks/useOfflineSync";
 import { useSharedStateQuerySync } from "@/src/hooks/useSharedStateQuerySync";
+import { useNetworkStatus } from "@/src/hooks/useNetworkStatus";
+import {
+  noteConnectivityRestored,
+  processOfflineQueue,
+} from "@/src/lib/sentry/sentryClient";
+import { AppErrorBoundary } from "@/src/components/error/AppErrorBoundary";
 
 function RequestQueueInstigator() {
   useEffect(() => installOfflineSync(), []);
@@ -17,6 +23,22 @@ function RequestQueueInstigator() {
 
 function SharedStateQueryBridge() {
   useSharedStateQuerySync();
+  return null;
+}
+
+function SentryOfflineQueueBridge() {
+  const isOnline = useNetworkStatus();
+
+  useEffect(() => {
+    if (isOnline) {
+      noteConnectivityRestored();
+    }
+  }, [isOnline]);
+
+  useEffect(() => {
+    void processOfflineQueue();
+  }, []);
+
   return null;
 }
 
@@ -36,11 +58,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <RequestQueueInstigator />
       <SharedStateQueryBridge />
+      <SentryOfflineQueueBridge />
       <ThemeProvider>
         <WalletProvider>
           <OfflineSyncProvider>
-            {children}
-            <WalletStatusBar />
+            <AppErrorBoundary>
+              {children}
+              <WalletStatusBar />
+            </AppErrorBoundary>
           </OfflineSyncProvider>
         </WalletProvider>
       </ThemeProvider>
