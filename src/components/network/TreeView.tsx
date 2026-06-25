@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import { easeCubicInOut } from "d3-ease";
 import { configureTreeLayout } from "../../lib/d3/treeLayout";
 
 interface TreeViewProps {
@@ -124,7 +125,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .merge(nodeEnter as any)
         .transition()
         .duration(400)
-        .ease(d3.easeInOut)
+        .ease(easeCubicInOut)
         .attr("transform", (d: any) => `translate(${d.y},${d.x})`);
 
       nodeUpdate
@@ -156,7 +157,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .exit()
         .transition()
         .duration(400)
-        .ease(d3.easeInOut)
+        .ease(easeCubicInOut)
         .attr("transform", () => `translate(${source.y},${source.x})`)
         .remove();
 
@@ -192,7 +193,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .merge(linkEnter as any)
         .transition()
         .duration(400)
-        .ease(d3.easeInOut)
+        .ease(easeCubicInOut)
         .attr("d", diagonal as any);
 
       // Exit phase: Contract links back down into structural parent node
@@ -200,7 +201,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .exit()
         .transition()
         .duration(400)
-        .ease(d3.easeInOut)
+        .ease(easeCubicInOut)
         .attr("d", () => {
           const o = { x: source.x, y: source.y };
           return diagonal({ source: o, target: o } as any);

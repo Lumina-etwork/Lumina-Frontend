@@ -11,7 +11,7 @@ import { useSkeletonTiming } from "@/src/hooks/useSkeletonTiming";
 import {
   useHierarchicalData,
   FlatNetworkNode,
-} from "@/src/hooks/useHierarchicalData";
+} from "../../hooks/useHierarchicalData";
 import type { NodePosition } from "@/src/types/network";
 
 interface DashboardStore {
@@ -61,19 +61,26 @@ const MOCK_NODES: NodePosition[] = Array.from({ length: 12 }, (_, i) => ({
 
 // Convert NodePosition to FlatNetworkNode for tree view
 const convertToFlatNodes = (nodes: NodePosition[]): FlatNetworkNode[] => {
-  return nodes.map((node, i) => ({
-    id: node.id,
-    name: node.label || node.id,
-    type: "node",
-    status: ["healthy", "warning", "critical"][i % 3] as
-      | "healthy"
-      | "warning"
-      | "critical",
-    region: node.metadata?.location?.split("-")[0] || "Uncategorized",
-    facility: node.metadata?.location || "Uncategorized",
-    rack: `Rack-${Math.floor(i / 3) + 1}`,
-    node: node.label || node.id,
-  }));
+  return nodes.map((node, i) => {
+    const location = node.metadata?.location;
+    const locationStr =
+      typeof location === "string" ? location : "Uncategorized";
+    const region = locationStr.split("-")[0] || "Uncategorized";
+
+    return {
+      id: node.id,
+      name: node.label || node.id,
+      type: "node",
+      status: ["healthy", "warning", "critical"][i % 3] as
+        | "healthy"
+        | "warning"
+        | "critical",
+      region,
+      facility: locationStr,
+      rack: `Rack-${Math.floor(i / 3) + 1}`,
+      node: node.label || node.id,
+    };
+  });
 };
 
 function NodeSectionSkeleton() {
