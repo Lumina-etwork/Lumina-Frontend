@@ -3,7 +3,7 @@ import { useKeyboardCommander } from '../../hooks/useKeyboardCommander';
 import { ShortcutCheatsheet } from '../../components/keyboard/ShortcutCheatsheet';
 import { ShortcutConfigPanel } from '../../components/keyboard/ShortcutConfigPanel';
 
-export const SettingsPage: React.FC = () => {
+  const SettingsPage: React.FC = () => {
   const [cheatsheetOpen, setCheatsheetOpen] = useState(false);
 
   // Core orchestration logic mapping registry targets to client action mutations
@@ -34,3 +34,5 @@ export const SettingsPage: React.FC = () => {
     </div>
   );
 };
+
+export default SettingsPage;
