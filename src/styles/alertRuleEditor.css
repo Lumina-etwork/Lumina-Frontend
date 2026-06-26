@@ -1,0 +1,588 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ScriptPlayground & AlertRuleEditor styles
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Script Playground ──────────────────────────────────────────────────── */
+
+.script-playground {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.script-playground__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
+  gap: 12px;
+}
+
+.script-playground__title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.script-playground__title-group h3 {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.script-playground__size-badge {
+  position: relative;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.script-playground__size-badge--over {
+  color: var(--color-danger-text);
+  border-color: var(--color-danger);
+}
+
+.script-playground__size-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--color-primary);
+  transition: width 0.2s ease;
+}
+
+.script-playground__size-badge--over .script-playground__size-bar {
+  background: var(--color-danger);
+}
+
+.script-playground__panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 420px;
+}
+
+@media (max-width: 768px) {
+  .script-playground__panes {
+    grid-template-columns: 1fr;
+  }
+}
+
+.script-playground__editor-pane {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--color-border);
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .script-playground__editor-pane {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+}
+
+.script-playground__editor-wrapper {
+  flex: 1;
+  min-height: 320px;
+}
+
+.script-playground__pane-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.script-playground__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.script-playground__dot--js {
+  background: #f7df1e;
+}
+
+.script-playground__dot--json {
+  background: #a3e635;
+}
+
+.script-playground__test-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.script-playground__test-data-section {
+  flex: 0 0 auto;
+}
+
+.script-playground__textarea {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  max-height: 180px;
+  resize: vertical;
+  padding: 12px;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-mono, 'Courier New', monospace);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.script-playground__textarea:focus {
+  background: var(--color-surface-alt);
+}
+
+.script-playground__run-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.script-playground__run-btn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.script-playground__run-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.script-playground__run-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.script-playground__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: playground-spin 0.6s linear infinite;
+}
+
+@keyframes playground-spin {
+  to { transform: rotate(360deg); }
+}
+
+.script-playground__output-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.script-playground__output {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  font-size: 0.8125rem;
+  min-height: 80px;
+}
+
+.script-playground__output-placeholder {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.script-playground__output--success {
+  background: rgba(34, 197, 94, 0.06);
+}
+
+.script-playground__output--error {
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.script-playground__output-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.script-playground__result-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.script-playground__result-icon--success {
+  background: #22c55e;
+  color: #fff;
+}
+
+.script-playground__result-icon--error {
+  background: #ef4444;
+  color: #fff;
+}
+
+.script-playground__output-body {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  font-family: var(--font-mono, 'Courier New', monospace);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+
+
+/* ─── Alert Rule Editor ──────────────────────────────────────────────────── */
+
+.alert-rule-editor {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.alert-rule-editor__header {
+  margin-bottom: 24px;
+}
+
+.alert-rule-editor__title {
+  margin: 0 0 4px;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.alert-rule-editor__subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.alert-rule-editor__mode-toggle {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  margin-bottom: 24px;
+}
+
+.alert-rule-editor__mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.alert-rule-editor__mode-btn:hover {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.alert-rule-editor__mode-btn--active {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.alert-rule-editor__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.alert-rule-editor__field-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .alert-rule-editor__field-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.alert-rule-editor__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.alert-rule-editor__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.alert-rule-editor__required {
+  color: var(--color-danger-text);
+}
+
+.alert-rule-editor__input,
+.alert-rule-editor__select {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.alert-rule-editor__input:focus,
+.alert-rule-editor__select:focus {
+  border-color: var(--color-primary);
+}
+
+.alert-rule-editor__textarea {
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+}
+
+.alert-rule-editor__severity-group {
+  display: flex;
+  gap: 6px;
+}
+
+.alert-rule-editor__severity-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: capitalize;
+}
+
+.alert-rule-editor__severity-btn:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.alert-rule-editor__severity-btn--selected.alert-rule-editor__severity-btn--critical {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.alert-rule-editor__severity-btn--selected.alert-rule-editor__severity-btn--warning {
+  background: rgba(234, 179, 8, 0.12);
+  border-color: #eab308;
+  color: #eab308;
+}
+
+.alert-rule-editor__severity-btn--selected.alert-rule-editor__severity-btn--info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.alert-rule-editor__toggle-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-alt);
+  cursor: pointer;
+}
+
+.alert-rule-editor__toggle-text {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.alert-rule-editor__toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border: none;
+  border-radius: 12px;
+  background: var(--color-border-light);
+  cursor: pointer;
+  transition: background 0.2s ease;
+  padding: 0;
+}
+
+.alert-rule-editor__toggle--on {
+  background: var(--color-primary);
+}
+
+.alert-rule-editor__toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.alert-rule-editor__toggle--on .alert-rule-editor__toggle-knob {
+  transform: translateX(20px);
+}
+
+/* Threshold section */
+
+.alert-rule-editor__section-title {
+  margin: 0 0 16px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.alert-rule-editor__threshold-section {
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-alt);
+  margin-bottom: 24px;
+}
+
+.alert-rule-editor__threshold-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 640px) {
+  .alert-rule-editor__threshold-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.alert-rule-editor__threshold-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.alert-rule-editor__preview-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.alert-rule-editor__preview-code {
+  font-family: var(--font-mono, 'Courier New', monospace);
+  font-size: 0.8125rem;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+/* Script section */
+
+.alert-rule-editor__script-section {
+  margin-bottom: 24px;
+}
+
+/* Footer */
+
+.alert-rule-editor__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.alert-rule-editor__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-danger-text);
+}
+
+.alert-rule-editor__save-btn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.alert-rule-editor__save-btn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.alert-rule-editor__save-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.alert-rule-editor__save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
