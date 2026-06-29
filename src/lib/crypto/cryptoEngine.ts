@@ -70,9 +70,9 @@ export async function encryptField(plaintext: string, sessionKey: CryptoKey, sal
   );
 
   return {
-    iv: bufferToBase64(iv.buffer),
-    salt: bufferToBase64(salt.buffer),
-    ciphertext: bufferToBase64(ciphertextBuffer),
+    iv: bufferToBase64(iv.buffer as ArrayBuffer),
+    salt: bufferToBase64(salt.buffer as ArrayBuffer),
+    ciphertext: bufferToBase64(ciphertextBuffer as ArrayBuffer),
     version: 1,
   };
 }

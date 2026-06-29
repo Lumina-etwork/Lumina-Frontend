@@ -22,7 +22,7 @@ export function useNodeConfig(getSessionKey: () => CryptoKey, getSalt: () => Uin
 
     for (const [key, value] of Object.entries(rawPayload)) {
       if (CONFIG_SCHEMA[key]?.sensitive && value && typeof value === 'object') {
-        decryptedConfig[key] = await decryptField(value, sessionKey);
+        decryptedConfig[key] = await decryptField(value as any, sessionKey);
       } else {
         decryptedConfig[key] = value;
       }
