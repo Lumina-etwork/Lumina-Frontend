@@ -361,3 +361,31 @@ export async function flushSyncQueue(): Promise<SyncFlushResult> {
 
   return result;
 }
+
+
+// ── Generic Wrappers for useNodeConfig Hook ──────────────────────────
+
+/**
+ * Wrapper to match hook signature for saving node configuration
+ */
+export async function saveToIndexedDB(key: string, data: any): Promise<void> {
+  // We use the nodeConfigSnapshots store. The key matches the nodeId.
+  await saveNodeConfigSnapshot({
+    nodeId: key,
+    config: data,
+    version: 1,
+    snapshotAt: new Date().toISOString()
+  });
+}
+
+/**
+ * Wrapper to match hook signature for loading node configuration
+ */
+export async function loadFromIndexedDB(key: string): Promise<any | null> {
+  const snapshots = await getNodeConfigSnapshots(key);
+  if (snapshots.length === 0) return null;
+  
+  // Sort by snapshot date to get the newest one if multiple exist
+  snapshots.sort((a, b) => new Date(b.snapshotAt).getTime() - new Date(a.snapshotAt).getTime());
+  return snapshots[0].config;
+}
