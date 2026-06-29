@@ -8,6 +8,18 @@ interface ExportState {
   bytesReceived: number;
   bytesTotal: number | null;
   error: Error | null;
+  usingFallback: boolean;
+}
+
+function triggerBlobDownload(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 export function useExportData() {
@@ -17,11 +29,14 @@ export function useExportData() {
     bytesReceived: 0,
     bytesTotal: null,
     error: null,
+    usingFallback: false,
   });
   
   const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const messageChannelRef = useRef<MessageChannel | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const chunksRef = useRef<Uint8Array[]>([]);
+  const formatRef = useRef<'csv' | 'json'>('csv');
 
   const updateState = useCallback((updates: Partial<ExportState>) => {
     setState(prev => ({ ...prev, ...updates }));
@@ -105,33 +120,90 @@ export function useExportData() {
       bytesReceived: 0,
       bytesTotal: options.bytesTotal || null,
       error: null,
+      usingFallback: false,
     });
+    formatRef.current = options.format;
+    chunksRef.current = [];
 
     try {
-      const registration = await navigator.serviceWorker.ready;
-      swRegistrationRef.current = registration;
+      // Check if File System Access API is available
+      const hasFileSystemAccess = 'showSaveFilePicker' in window;
       
-      abortControllerRef.current = new AbortController();
-      messageChannelRef.current = new MessageChannel();
+      if (!hasFileSystemAccess) {
+        // Fallback: use traditional blob download
+        updateState({ usingFallback: true, status: 'downloading' });
+        
+        abortControllerRef.current = new AbortController();
+        
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            format: options.format,
+            startDate: options.startDate.toISOString(),
+            endDate: options.endDate.toISOString(),
+          }),
+          signal: abortControllerRef.current.signal,
+        });
 
-      navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+        if (!response.ok) {
+          throw new Error(`Export failed with status: ${response.status}`);
+        }
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Stream-Export': 'true',
-        },
-        body: JSON.stringify({
-          format: options.format,
-          startDate: options.startDate.toISOString(),
-          endDate: options.endDate.toISOString(),
-        }),
-        signal: abortControllerRef.current.signal,
-      });
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error('Response body is not readable');
+        }
 
-      if (!response.ok) {
-        throw new Error(`Export failed with status: ${response.status}`);
+        let received = 0;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          if (value) {
+            chunksRef.current.push(value);
+            received += value.length;
+            const progress = options.bytesTotal ? Math.min(100, (received / options.bytesTotal) * 100) : 0;
+            updateState({ bytesReceived: received, progress });
+          }
+        }
+
+        // Create blob and trigger download
+        const blob = new Blob(chunksRef.current, {
+          type: options.format === 'csv' ? 'text/csv' : 'application/json',
+        });
+        const filename = `node-telemetry-${Date.now()}.${options.format}`;
+        triggerBlobDownload(blob, filename);
+        
+        updateState({ status: 'complete', progress: 100, bytesReceived: received });
+      } else {
+        // Use File System Access API via service worker
+        const registration = await navigator.serviceWorker.ready;
+        swRegistrationRef.current = registration;
+        
+        abortControllerRef.current = new AbortController();
+        messageChannelRef.current = new MessageChannel();
+
+        navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Stream-Export': 'true',
+          },
+          body: JSON.stringify({
+            format: options.format,
+            startDate: options.startDate.toISOString(),
+            endDate: options.endDate.toISOString(),
+          }),
+          signal: abortControllerRef.current.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Export failed with status: ${response.status}`);
+        }
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
@@ -159,7 +231,9 @@ export function useExportData() {
       bytesReceived: 0,
       bytesTotal: null,
       error: null,
+      usingFallback: false,
     });
+    chunksRef.current = [];
   }, []);
 
   return {

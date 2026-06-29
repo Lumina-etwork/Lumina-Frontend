@@ -5,6 +5,7 @@ interface ExportProgressIndicatorProps {
   bytesReceived: number;
   bytesTotal: number | null;
   status: 'idle' | 'initializing' | 'downloading' | 'complete' | 'error' | 'aborted';
+  usingFallback?: boolean;
   onAbort?: () => void;
 }
 
@@ -13,6 +14,7 @@ export function ExportProgressIndicator({
   bytesReceived, 
   bytesTotal, 
   status, 
+  usingFallback = false,
   onAbort 
 }: ExportProgressIndicatorProps) {
   const [speedHistory, setSpeedHistory] = useState<number[]>([]);
@@ -80,6 +82,14 @@ export function ExportProgressIndicator({
       <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
         {getStatusText()}
       </h3>
+
+      {usingFallback && status !== 'idle' && (
+        <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-md">
+          <p className="text-sm text-yellow-800 dark:text-yellow-200">
+            ⚠️ Using fallback download method. For very large exports, this may use more memory.
+          </p>
+        </div>
+      )}
 
       {status !== 'idle' && (
         <>
