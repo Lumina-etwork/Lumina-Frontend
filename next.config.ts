@@ -2,24 +2,43 @@ import type { NextConfig } from "next";
 import withSerwistInit from "@serwist/next";
 
 const withSerwist = withSerwistInit({
-  // The Serwist worker source is authored in TypeScript under app/sw.ts so
-  // it can live next to the rest of the App Router tree. Serwist compiles
-  // it down to public/sw.js during `next build`.
-  swSrc: "app/sw.ts",
+  swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
-  // Disable the worker in development so HMR bundles are never cached —
-  // the service worker would otherwise pin stale chunks and break the
-  // Next.js dev server. Production builds always include the worker.
   disable: process.env.NODE_ENV !== "production",
   reloadOnOnline: false,
   cacheOnNavigation: true,
-  // Cap is enforced at build time by Serwist; the SW never inspects it.
   maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
 });
 
 const nextConfig: NextConfig = {
+  turbopack: {},
   experimental: {
-    optimizePackageImports: ["recharts", "d3-scale"],
+    optimizePackageImports: ["recharts", "d3-scale", "d3"],
+  },
+  // Content-Security-Policy: defence-in-depth against XSS.
+  async headers() {
+    return [
+      {
+        source: "/((?!_next/static|_next/image|icons|manifest).*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : ""}`,
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob:",
+              "font-src 'self'",
+              "connect-src 'self' wss: https:",
+              "frame-src 'none'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join("; "),
+          },
+        ],
+      },
+    ];
   },
   webpack(config, { isServer }) {
     if (!isServer) {
@@ -30,7 +49,7 @@ const nextConfig: NextConfig = {
         minSize: 20000,
         cacheGroups: {
           "vendors-charts": {
-            test: /[\\/]node_modules[\\/](recharts|d3-scale|d3-array|d3-format|d3-interpolate|d3-time|d3-time-format|d3-color|d3-shape|d3-path)[\\/]/,
+            test: /[\\/]node_modules[\\/](recharts|d3-scale|d3-array|d3-format|d3-interpolate|d3-time|d3-time-format|d3-color|d3-shape|d3-path|d3)[\\/]/,
             name: "vendors-charts",
             chunks: "all",
             priority: 30,

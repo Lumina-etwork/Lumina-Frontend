@@ -10,12 +10,10 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { enqueueError } from "@/src/lib/sentry/sentryClient";
 
 export type ConnectionState =
-  | "connecting"
-  | "connected"
-  | "disconnected"
-  | "error";
+  "connecting" | "connected" | "disconnected" | "error";
 
 export interface WebSocketConfig {
   /** WebSocket URL */
@@ -123,6 +121,11 @@ export function useWebSocket<T = unknown>(
         setState("error");
         setError(event);
         console.error("[useWebSocket] Connection error:", event);
+        void enqueueError(new Error(`WebSocket connection error: ${url}`), {
+          component: "useWebSocket",
+          tags: { transport: "websocket" },
+          extra: { url, type: event.type },
+        });
       };
 
       ws.onclose = () => {
@@ -155,6 +158,14 @@ export function useWebSocket<T = unknown>(
             console.error(
               `[useWebSocket] Max reconnection attempts (${maxReconnectAttempts}) reached`,
             );
+            void enqueueError(
+              new Error(`WebSocket connection dropped: ${url}`),
+              {
+                component: "useWebSocket",
+                tags: { transport: "websocket" },
+                extra: { url, reconnectAttempts: attempts },
+              },
+            );
           }
         }
       };
@@ -162,6 +173,11 @@ export function useWebSocket<T = unknown>(
       wsRef.current = ws;
     } catch (err) {
       console.error("[useWebSocket] Failed to create connection:", err);
+      void enqueueError(err, {
+        component: "useWebSocket",
+        tags: { transport: "websocket" },
+        extra: { url },
+      });
       setState("error");
     }
   }, [

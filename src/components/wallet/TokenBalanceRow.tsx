@@ -57,11 +57,12 @@ export function TokenBalanceRow({
   locale,
   loading = false,
 }: TokenBalanceRowProps) {
-  const balance = useFormattedBalance(stroopBalance, decimals, locale);
+  const hasBalance = stroopBalance != null;
+  const balance = useFormattedBalance(stroopBalance ?? 0n, decimals, locale);
 
   if (loading) return <LoadingSkeleton />;
 
-  if (stroopBalance == null) {
+  if (!hasBalance) {
     return <ErrorRow symbol={symbol} message="Balance unavailable" />;
   }
 
