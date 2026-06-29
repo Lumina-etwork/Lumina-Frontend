@@ -40,7 +40,6 @@ interface FileSystemWritableFileStream extends WritableStream {
 interface FileSystemFileHandle extends FileSystemHandle {
   getFile(): Promise<File>;
   createWritable(options?: FileSystemCreateWritableOptions): Promise<FileSystemWritableFileStream>;
-  isSameEntry(other: FileSystemHandle): boolean;
 }
 
 declare global {
