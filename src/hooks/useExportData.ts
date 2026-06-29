@@ -35,7 +35,7 @@ export function useExportData() {
   const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const messageChannelRef = useRef<MessageChannel | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const chunksRef = useRef<Uint8Array[]>([]);
+  const chunksRef = useRef<(Uint8Array | BlobPart)[]>([]);
   const formatRef = useRef<'csv' | 'json'>('csv');
 
   const updateState = useCallback((updates: Partial<ExportState>) => {
