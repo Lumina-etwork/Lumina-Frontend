@@ -137,7 +137,8 @@ async function handleStreamExport(request: Request, clientId: string) {
       return new Response('Client not found', { status: 400 });
     }
 
-    const { port2 } = new MessageChannel();
+    const messageChannel = new MessageChannel();
+    const { port1, port2 } = messageChannel;
     const CHUNK_SIZE = 64 * 1024;
     const PROGRESS_THRESHOLD = 1024 * 1024;
     
@@ -165,7 +166,7 @@ async function handleStreamExport(request: Request, clientId: string) {
               if (activeFileStream) {
                 await activeFileStream.close();
               }
-              client.postMessage({ type: 'export-complete', bytesWritten }, [port1]);
+              client.postMessage({ type: 'export-complete', bytesWritten });
               break;
             }
 
@@ -189,22 +190,21 @@ async function handleStreamExport(request: Request, clientId: string) {
                   type: 'progress', 
                   bytesReceived, 
                   bytesWritten 
-                }, [port1]);
+                });
                 lastProgressEmittedAt = bytesReceived;
               }
             }
           }
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
-            client.postMessage({ type: 'export-aborted' }, [port1]);
+            client.postMessage({ type: 'export-aborted' });
           } else {
-            client.postMessage({ type: 'export-error', error }, [port1]);
+            client.postMessage({ type: 'export-error', error });
           }
         }
       }
     };
 
-    const { port1 } = new MessageChannel();
     client.postMessage({ type: 'request-file-handle' }, [port1]);
     
     return new Response('Export initiated', { status: 200 });

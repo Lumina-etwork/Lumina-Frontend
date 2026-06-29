@@ -4,7 +4,7 @@
 
 interface FilePickerAcceptType {
   description?: string;
-  [key: string]: string | string[];
+  accept: Record<string, string[]>;
 }
 
 interface SaveFilePickerOptions {
