@@ -1,8 +1,8 @@
 import dynamic from "next/dynamic";
-import { DashboardSkeleton } from "@/app/components/dashboard/DashboardSkeleton";
+import { DashboardSkeleton } from "@/src/app/components/dashboard/DashboardSkeleton";
 
 const MeshTopologyMap = dynamic(
-  () => import("@/app/components/network/MeshTopologyMap").then((m) => ({ default: m.MeshTopologyMap })),
+  () => import("@/src/app/components/network/MeshTopologyMap").then((m) => ({ default: m.MeshTopologyMap })),
   {
     loading: () => (
       <div className="h-[400px] w-full animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-700" />

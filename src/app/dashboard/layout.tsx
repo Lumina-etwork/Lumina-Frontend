@@ -2,7 +2,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 
 const WalletConnector = dynamic(
-  () => import("@/app/components/wallet/WalletConnector").then((m) => ({ default: m.WalletConnector })),
+  () => import("@/src/app/components/wallet/WalletConnector").then((m) => ({ default: m.WalletConnector })),
   { loading: () => <div className="h-9 w-36 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-700" /> }
 );
 

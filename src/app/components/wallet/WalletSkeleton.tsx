@@ -1,6 +1,6 @@
 "use client";
 
-import { Skeleton } from "@/app/components/ui/Skeleton";
+import { Skeleton } from "@/src/app/components/ui/Skeleton";
 
 export function WalletSkeleton() {
   return (

@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 
 const TxModal = dynamic(
-  () => import("@/app/components/dashboard/TxModal").then((m) => ({ default: m.TxModal })),
+  () => import("@/src/app/components/dashboard/TxModal").then((m) => ({ default: m.TxModal })),
   { loading: () => <div className="h-4 w-12 animate-pulse rounded bg-zinc-200 dark:bg-zinc-700" /> }
 );
 
