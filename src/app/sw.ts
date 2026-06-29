@@ -8,6 +8,41 @@ import {
   Serwist,
 } from "serwist";
 
+interface FilePickerAcceptType {
+  description?: string;
+  accept: Record<string, string[]>;
+}
+
+interface SaveFilePickerOptions {
+  suggestedName?: string;
+  types?: FilePickerAcceptType[];
+  excludeAcceptAllOption?: boolean;
+  id?: string;
+  startIn?: FileSystemHandle | string;
+}
+
+interface FileSystemHandlePermissionDescriptor {
+  name: 'file' | 'directory';
+  mode?: 'read' | 'readwrite';
+}
+
+interface FileSystemCreateWritableOptions {
+  keepExistingData?: boolean;
+}
+
+interface FileSystemWritableFileStream extends WritableStream {
+  write(data: any): Promise<void>;
+  seek(position: number): Promise<void>;
+  truncate(size: number): Promise<void>;
+  close(): Promise<void>;
+}
+
+interface FileSystemFileHandle extends FileSystemHandle {
+  getFile(): Promise<File>;
+  createWritable(options?: FileSystemCreateWritableOptions): Promise<FileSystemWritableFileStream>;
+  isSameEntry(other: FileSystemHandle): boolean;
+}
+
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
