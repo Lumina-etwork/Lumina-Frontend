@@ -37,15 +37,12 @@ function applyTheme(theme: Theme) {
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
+  const [theme, setThemeState] = useState<Theme>(() => getStoredTheme());
+  const mounted = true;
 
   useEffect(() => {
-    const initial = getStoredTheme();
-    setThemeState(initial);
-    applyTheme(initial);
-    setMounted(true);
-  }, []);
+    applyTheme(theme);
+  }, [theme]);
 
   useEffect(() => {
     if (!mounted) return;

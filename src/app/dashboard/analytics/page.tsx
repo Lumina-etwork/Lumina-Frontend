@@ -1,52 +1,66 @@
-'use client'
+"use client";
 
-import { useCallback, useEffect, useState } from 'react'
-import { AnalyticsTimeSeries } from '@/src/components/charts/AnalyticsTimeSeries'
-import { SkeletonChart } from '@/src/components/skeleton/SkeletonChart'
-import { useNetworkAnalytics } from '@/src/hooks/useNetworkAnalytics'
-import type { AnalyticsDataPoint, AggregatedResult, RollupGranularity } from '@/src/types/network'
+import { useCallback, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { SkeletonChart } from "@/src/components/skeleton/SkeletonChart";
+import { useNetworkAnalytics } from "@/src/hooks/useNetworkAnalytics";
+import type {
+  AnalyticsDataPoint,
+  AggregatedResult,
+  RollupGranularity,
+} from "@/src/types/network";
+
+// Lazy-load the heavy chart component so the vendors-charts chunk is only
+// fetched when this page is first visited (code-splitting goal of PR #29).
+const AnalyticsTimeSeries = dynamic(
+  () =>
+    import("@/src/components/charts/AnalyticsTimeSeries").then((m) => ({
+      default: m.AnalyticsTimeSeries,
+    })),
+  { loading: () => <SkeletonChart bars={20} height={300} /> },
+);
 
 function generateMockData(): AnalyticsDataPoint[] {
-  const now = Date.now()
-  const points: AnalyticsDataPoint[] = []
+  const now = Date.now();
+  const points: AnalyticsDataPoint[] = [];
   for (let i = 0; i < 500_000; i++) {
-    const timestamp = now - i * 60_000
+    const timestamp = now - i * 60_000;
     points.push({
       timestamp,
       latency: Math.random() * 200 + 10,
       throughput: Math.random() * 1000 + 100,
       packetLoss: Math.random() * 0.05,
-    })
+    });
   }
-  return points
+  return points;
 }
 
 export default function AnalyticsPage() {
-  const { aggregate, workerAvailable } = useNetworkAnalytics()
-  const [result, setResult] = useState<AggregatedResult | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [granularity, setGranularity] = useState<RollupGranularity>('hourly')
+  const { aggregate, workerAvailable } = useNetworkAnalytics();
+  const [result, setResult] = useState<AggregatedResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [granularity, setGranularity] = useState<RollupGranularity>("hourly");
 
   const runAggregation = useCallback(async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const now = Date.now()
-      const data = generateMockData()
+      const now = Date.now();
+      const data = generateMockData();
       const config = {
         granularity,
         startTime: now - 365 * 86_400_000,
         endTime: now,
-      }
-      const res = await aggregate(data, config)
-      setResult(res)
+      };
+      const res = await aggregate(data, config);
+      setResult(res);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [aggregate, granularity])
+  }, [aggregate, granularity]);
 
   useEffect(() => {
-    runAggregation()
-  }, [runAggregation])
+    runAggregation();
+  }, [runAggregation]);
 
   return (
     <main className="min-h-screen bg-[#f7f4ee] text-[#171512]">
@@ -75,13 +89,13 @@ export default function AnalyticsPage() {
         </header>
 
         <div className="flex flex-wrap gap-3 py-5">
-          {(['hourly', 'daily', 'weekly'] as const).map((g) => (
+          {(["hourly", "daily", "weekly"] as const).map((g) => (
             <button
               key={g}
               className={`rounded-md border px-4 py-2 text-sm font-semibold transition ${
                 granularity === g
-                  ? 'border-[#0f766e] bg-[#0f766e] text-white'
-                  : 'border-[#cfc4b1] bg-white text-[#3e3830] hover:border-[#0f766e] hover:text-[#0f766e]'
+                  ? "border-[#0f766e] bg-[#0f766e] text-white"
+                  : "border-[#cfc4b1] bg-white text-[#3e3830] hover:border-[#0f766e] hover:text-[#0f766e]"
               }`}
               onClick={() => setGranularity(g)}
               type="button"
@@ -95,7 +109,7 @@ export default function AnalyticsPage() {
             onClick={runAggregation}
             type="button"
           >
-            {loading ? 'Computing…' : 'Recompute'}
+            {loading ? "Computing…" : "Recompute"}
           </button>
         </div>
 
@@ -106,5 +120,5 @@ export default function AnalyticsPage() {
         )}
       </div>
     </main>
-  )
+  );
 }

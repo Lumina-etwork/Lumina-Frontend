@@ -9,9 +9,16 @@ const TEST_WALLETS = {
 async function mockFreighter(page: Page, publicKey: string) {
   await page.addInitScript(
     ({ pk }: { pk: string }) => {
-      let currentPk: string | null = pk;
+      let currentPk = pk;
+      const mockWindow = window as unknown as Window & {
+        freighter: {
+          getUserInfo: () => Promise<{ publicKey: string }>;
+          isConnected: () => Promise<{ isConnected: boolean }>;
+        };
+        __switchWallet: (pk: string) => void;
+      };
 
-      (window as unknown as Record<string, unknown>).freighter = {
+      mockWindow.freighter = {
         getUserInfo: async () => ({ publicKey: currentPk }),
         isConnected: async () => ({ isConnected: true }),
       };
@@ -21,8 +28,8 @@ async function mockFreighter(page: Page, publicKey: string) {
         window.dispatchEvent(new Event("accountChange"));
       }
 
-      (window as unknown as Record<string, unknown>).__switchWallet = (pk: string) => {
-        triggerAccountChange(pk);
+      mockWindow.__switchWallet = (nextPk: string) => {
+        triggerAccountChange(nextPk);
       };
     },
     { pk: publicKey },
@@ -49,11 +56,19 @@ test.describe("Wallet identity toggling", () => {
     await checkWalletData(TEST_WALLETS.alice);
 
     for (let round = 0; round < 5; round++) {
-      const wallets = [TEST_WALLETS.bob, TEST_WALLETS.carol, TEST_WALLETS.alice];
+      const wallets = [
+        TEST_WALLETS.bob,
+        TEST_WALLETS.carol,
+        TEST_WALLETS.alice,
+      ];
       for (const wallet of wallets) {
         await page.evaluate(
-          ({ pk }: { pk: string }) =>
-            ((window as unknown as Record<string, unknown>).__switchWallet as (pk: string) => void)(pk),
+          ({ pk }: { pk: string }) => {
+            const mockWindow = window as unknown as Window & {
+              __switchWallet: (nextPk: string) => void;
+            };
+            mockWindow.__switchWallet(pk);
+          },
           { pk: wallet },
         );
         await page.waitForTimeout(50);
@@ -63,16 +78,24 @@ test.describe("Wallet identity toggling", () => {
     await checkWalletData(TEST_WALLETS.alice);
 
     await page.evaluate(
-      ({ pk }: { pk: string }) =>
-        ((window as unknown as Record<string, unknown>).__switchWallet as (pk: string) => void)(pk),
+      ({ pk }: { pk: string }) => {
+        const mockWindow = window as unknown as Window & {
+          __switchWallet: (nextPk: string) => void;
+        };
+        mockWindow.__switchWallet(pk);
+      },
       { pk: TEST_WALLETS.bob },
     );
     await page.waitForTimeout(100);
     await checkWalletData(TEST_WALLETS.bob);
 
     await page.evaluate(
-      ({ pk }: { pk: string }) =>
-        ((window as unknown as Record<string, unknown>).__switchWallet as (pk: string) => void)(pk),
+      ({ pk }: { pk: string }) => {
+        const mockWindow = window as unknown as Window & {
+          __switchWallet: (nextPk: string) => void;
+        };
+        mockWindow.__switchWallet(pk);
+      },
       { pk: TEST_WALLETS.carol },
     );
     await page.waitForTimeout(100);
@@ -97,16 +120,24 @@ test.describe("Wallet identity toggling", () => {
             ? TEST_WALLETS.carol
             : TEST_WALLETS.alice;
       await page.evaluate(
-        ({ pk }: { pk: string }) =>
-          ((window as unknown as Record<string, unknown>).__switchWallet as (pk: string) => void)(pk),
+        ({ pk }: { pk: string }) => {
+          const mockWindow = window as unknown as Window & {
+            __switchWallet: (nextPk: string) => void;
+          };
+          mockWindow.__switchWallet(pk);
+        },
         { pk: wallet },
       );
       await page.waitForTimeout(30);
     }
 
     await page.evaluate(
-      ({ pk }: { pk: string }) =>
-        ((window as unknown as Record<string, unknown>).__switchWallet as (pk: string) => void)(pk),
+      ({ pk }: { pk: string }) => {
+        const mockWindow = window as unknown as Window & {
+          __switchWallet: (nextPk: string) => void;
+        };
+        mockWindow.__switchWallet(pk);
+      },
       { pk: TEST_WALLETS.carol },
     );
     await page.waitForTimeout(200);

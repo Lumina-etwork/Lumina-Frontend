@@ -1,52 +1,52 @@
 /**
  * Demo page for ThroughputChart component
- * 
+ *
  * Includes:
  * - Mock WebSocket server simulation
  * - High-frequency message generator (200+ msg/s)
  * - Performance monitoring controls
  */
 
-'use client'
+"use client";
 
-import { useState, useEffect, useRef } from 'react'
-import { ThroughputChart } from '@/src/components/charts/ThroughputChart'
+import { useState, useEffect, useRef } from "react";
+import { ThroughputChart } from "@/src/components/charts/ThroughputChart";
 
 // Mock WebSocket Server for testing
 class MockWebSocketServer {
-  private clients: Set<WebSocket> = new Set()
-  private intervalId: NodeJS.Timeout | null = null
-  private messageRate = 200 // messages per second
-  private counter = 0
+  private clients: Set<WebSocket> = new Set();
+  private intervalId: NodeJS.Timeout | null = null;
+  private messageRate = 200; // messages per second
+  private counter = 0;
 
   start() {
-    if (this.intervalId) return
+    if (this.intervalId) return;
 
     // Send messages at specified rate
-    const intervalMs = 1000 / this.messageRate
+    const intervalMs = 1000 / this.messageRate;
     this.intervalId = setInterval(() => {
       this.broadcast({
         timestamp: Date.now(),
         packetsForwarded: Math.floor(Math.random() * 100),
         throughput: Math.random() * 1000 + 500, // 500-1500 packets/s
-        nodeId: 'mock-node-1',
-      })
-      this.counter++
-    }, intervalMs)
+        nodeId: "mock-node-1",
+      });
+      this.counter++;
+    }, intervalMs);
   }
 
   stop() {
     if (this.intervalId) {
-      clearInterval(this.intervalId)
-      this.intervalId = null
+      clearInterval(this.intervalId);
+      this.intervalId = null;
     }
   }
 
   setMessageRate(rate: number) {
-    this.messageRate = rate
+    this.messageRate = rate;
     if (this.intervalId) {
-      this.stop()
-      this.start()
+      this.stop();
+      this.start();
     }
   }
 
@@ -54,54 +54,54 @@ class MockWebSocketServer {
     // In a real mock, we'd send to actual WebSocket clients
     // For this demo, we'll emit custom events
     window.dispatchEvent(
-      new CustomEvent('mock-ws-message', { detail: message })
-    )
+      new CustomEvent("mock-ws-message", { detail: message }),
+    );
   }
 
   getMessageCount() {
-    return this.counter
+    return this.counter;
   }
 
   reset() {
-    this.counter = 0
+    this.counter = 0;
   }
 }
 
 export default function ThroughputDemoPage() {
-  const [wsUrl] = useState('ws://localhost:8080/throughput') // Not used in mock
-  const [messageRate, setMessageRate] = useState(200)
-  const [enablePerformance, setEnablePerformance] = useState(true)
-  const [serverRunning, setServerRunning] = useState(false)
-  const serverRef = useRef<MockWebSocketServer>(new MockWebSocketServer())
+  const [wsUrl] = useState("ws://localhost:8080/throughput"); // Not used in mock
+  const [messageRate, setMessageRate] = useState(200);
+  const [enablePerformance, setEnablePerformance] = useState(true);
+  const [serverRunning, setServerRunning] = useState(true);
+  const serverRef = useRef<MockWebSocketServer>(new MockWebSocketServer());
 
   useEffect(() => {
     // Auto-start server
-    serverRef.current.start()
-    setServerRunning(true)
+    const server = serverRef.current;
+    server.start();
 
     return () => {
-      serverRef.current.stop()
-    }
-  }, [])
+      server.stop();
+    };
+  }, []);
 
   const handleRateChange = (rate: number) => {
-    setMessageRate(rate)
-    serverRef.current.setMessageRate(rate)
-  }
+    setMessageRate(rate);
+    serverRef.current.setMessageRate(rate);
+  };
 
   const toggleServer = () => {
     if (serverRunning) {
-      serverRef.current.stop()
-      setServerRunning(false)
+      serverRef.current.stop();
+      setServerRunning(false);
     } else {
-      serverRef.current.start()
-      setServerRunning(true)
+      serverRef.current.start();
+      setServerRunning(true);
     }
-  }
+  };
 
   const resetStats = () => {
-    serverRef.current.reset()
-  }
+    serverRef.current.reset();
+  };
 
   return (
     <div className="min-h-screen bg-[#f7f4ee] p-8">
@@ -132,11 +132,11 @@ export default function ThroughputDemoPage() {
                 onClick={toggleServer}
                 className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${
                   serverRunning
-                    ? 'bg-red-600 hover:bg-red-700'
-                    : 'bg-green-600 hover:bg-green-700'
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-green-600 hover:bg-green-700"
                 }`}
               >
-                {serverRunning ? 'Stop Server' : 'Start Server'}
+                {serverRunning ? "Stop Server" : "Start Server"}
               </button>
             </div>
 
@@ -169,11 +169,11 @@ export default function ThroughputDemoPage() {
                 onClick={() => setEnablePerformance(!enablePerformance)}
                 className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                   enablePerformance
-                    ? 'bg-[#0f766e] text-white'
-                    : 'bg-gray-200 text-gray-700'
+                    ? "bg-[#0f766e] text-white"
+                    : "bg-gray-200 text-gray-700"
                 }`}
               >
-                {enablePerformance ? 'Enabled' : 'Disabled'}
+                {enablePerformance ? "Enabled" : "Disabled"}
               </button>
             </div>
           </div>
@@ -256,5 +256,5 @@ export default function ThroughputDemoPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
