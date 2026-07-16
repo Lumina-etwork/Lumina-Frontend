@@ -44,6 +44,11 @@ export function configureSorobanClient(config: Partial<SorobanRpcConfig>) {
   if (config.networkPassphrase) networkPassphrase = config.networkPassphrase;
 }
 
+/** Read-only snapshot for runtime configuration auditing. */
+export function getSorobanRpcConfig(): SorobanRpcConfig {
+  return { serverUrl: rpcUrl, networkPassphrase };
+}
+
 async function rpcCall(method: string, params: Record<string, unknown>) {
   const response = await fetch(rpcUrl, {
     method: "POST",

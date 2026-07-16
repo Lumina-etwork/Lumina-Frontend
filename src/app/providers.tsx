@@ -16,6 +16,7 @@ import {
   processOfflineQueue,
 } from "@/src/lib/sentry/sentryClient";
 import { AppErrorBoundary } from "@/src/components/error/AppErrorBoundary";
+import { ConfigAuditBridge } from "@/src/components/providers/ConfigAuditBridge";
 
 function RequestQueueInstigator() {
   useEffect(() => installOfflineSync(), []);
@@ -60,6 +61,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <RequestQueueInstigator />
       <SharedStateQueryBridge />
       <SentryOfflineQueueBridge />
+      <ConfigAuditBridge />
       <ThemeProvider>
         <WalletProvider>
           <SessionProvider>
