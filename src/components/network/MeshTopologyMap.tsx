@@ -94,6 +94,25 @@ function hexToRgba(hex: string): [number, number, number, number] {
   ]
 }
 
+function resolveThemeColor(varName: string, fallback: string): string {
+  try {
+    const val = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+    return val || fallback
+  } catch {
+    return fallback
+  }
+}
+
+function resolveMeshConfigColors(cfg: MeshTopologyConfig): MeshTopologyConfig {
+  return {
+    ...cfg,
+    colorNodeDefault: resolveThemeColor('--color-primary', cfg.colorNodeDefault),
+    colorEdgeDefault: resolveThemeColor('--color-border', cfg.colorEdgeDefault),
+    colorSelected: resolveThemeColor('--color-status-warning', cfg.colorSelected),
+    colorBackground: resolveThemeColor('--color-bg', cfg.colorBackground),
+  }
+}
+
 function nodeIndexToPickColor(index: number): [number, number, number, number] {
   return [
     ((index >> 0) & 0xff) / 255,
@@ -244,7 +263,8 @@ function renderWebGL2(
 ): void {
   const { gl } = ctx
   gl.viewport(0, 0, viewport.width, viewport.height)
-  gl.clearColor(0, 0, 0, 1)
+  const bgParts = hexToRgba(config.colorBackground)
+  gl.clearColor(bgParts[0], bgParts[1], bgParts[2], 1)
   gl.clear(gl.COLOR_BUFFER_BIT)
 
   const trans = [
@@ -354,6 +374,8 @@ function renderCanvas2D(
     }
   }
 
+  const labelColor = resolveThemeColor('--color-text', '#171512')
+
   for (const n of nodes) {
     const radius = lodLevel === 'dots'
       ? config.lodDotRadius
@@ -368,7 +390,7 @@ function renderCanvas2D(
     ctx.fill()
 
     if (lodLevel !== 'dots' && viewport.zoom > 1 && n.label) {
-      ctx.fillStyle = '#171512'
+      ctx.fillStyle = labelColor
       ctx.font = '11px sans-serif'
       ctx.textAlign = 'center'
       ctx.fillText(n.label, n.x, n.y - radius - 4)
@@ -530,10 +552,11 @@ export function MeshTopologyMap({
     }
 
     const lod = getLodLevel(currentViewport.zoom, cfg)
+    const resolvedCfg = resolveMeshConfigColors(cfg)
 
     const gl = glRef.current
     if (gl && renderModeRef.current === 'webgl2') {
-      renderWebGL2(gl, renderNodes, edges, currentViewport, cfg, lod, false)
+      renderWebGL2(gl, renderNodes, edges, currentViewport, resolvedCfg, lod, false)
     } else {
       const ctx2d = canvas.getContext('2d')
       if (ctx2d) {
@@ -543,7 +566,7 @@ export function MeshTopologyMap({
           window.devicePixelRatio || 1,
           0, 0,
         )
-        renderCanvas2D(ctx2d, renderNodes, edges, currentViewport, cfg, lod, selectedNodeId)
+        renderCanvas2D(ctx2d, renderNodes, edges, currentViewport, resolvedCfg, lod, selectedNodeId)
       }
     }
 
@@ -786,7 +809,7 @@ export function MeshTopologyMap({
           Layout: {Math.round(layout.progress * 100)}%
         </div>
       )}
-      <div className="pointer-events-none absolute left-2 top-2 text-xs text-gray-500">
+      <div className="pointer-events-none absolute left-2 top-2 text-xs text-muted">
         Nodes: {nodes.length} | Edges: {edges.length} | Zoom: {viewport.zoom.toFixed(2)}
       </div>
     </div>

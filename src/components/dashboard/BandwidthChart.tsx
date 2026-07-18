@@ -219,12 +219,12 @@ export function BandwidthChart({
   }, [dimensions, useWorker, mainThreadDecimated])
 
   return (
-    <div ref={containerRef} className="rounded-lg border border-[#d8d0c1] bg-white p-4">
+    <div ref={containerRef} className="rounded-lg border border-border bg-surface p-4">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-[#171512]">{title}</h3>
-          <div className="mt-1 flex items-center gap-4 text-xs text-[#6f5f48]">
+          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+          <div className="mt-1 flex items-center gap-4 text-xs text-muted">
             <span className="flex items-center gap-1">
               <span
                 className={`inline-block h-2 w-2 rounded-full ${
@@ -239,7 +239,7 @@ export function BandwidthChart({
             </span>
             <span>{stats.pointsCount} / 300 points</span>
             {enablePerformanceTracking && (
-              <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">
+              <span className="text-[10px] bg-surface-alt text-muted px-1.5 py-0.5 rounded font-mono">
                 {useWorker ? 'Worker Offscreen' : 'Main Thread Fallback'}
               </span>
             )}
@@ -261,33 +261,33 @@ export function BandwidthChart({
 
       {/* Stats footer */}
       {stats.pointsCount > 0 && (
-        <div className="mt-4 grid grid-cols-3 gap-4 border-t border-[#ece5d8] pt-4">
+        <div className="mt-4 grid grid-cols-3 gap-4 border-t border-table-divider pt-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#6f5f48]">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
               Current
             </p>
-            <p className="mt-1 text-lg font-semibold text-[#1a1410]">
+            <p className="mt-1 text-lg font-semibold text-foreground">
               {stats.current.toFixed(2)}
             </p>
-            <p className="text-xs text-[#6f5f48]">Mb/s</p>
+            <p className="text-xs text-muted">Mb/s</p>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#6f5f48]">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
               Average
             </p>
-            <p className="mt-1 text-lg font-semibold text-[#1a1410]">
+            <p className="mt-1 text-lg font-semibold text-foreground">
               {stats.average.toFixed(2)}
             </p>
-            <p className="text-xs text-[#6f5f48]">Mb/s</p>
+            <p className="text-xs text-muted">Mb/s</p>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#6f5f48]">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
               Peak
             </p>
-            <p className="mt-1 text-lg font-semibold text-[#1a1410]">
+            <p className="mt-1 text-lg font-semibold text-foreground">
               {stats.peak.toFixed(2)}
             </p>
-            <p className="text-xs text-[#6f5f48]">Mb/s</p>
+            <p className="text-xs text-muted">Mb/s</p>
           </div>
         </div>
       )}

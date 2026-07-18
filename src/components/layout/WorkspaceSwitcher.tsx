@@ -63,7 +63,7 @@ export function WorkspaceSwitcher() {
         id="workspace-select"
         value={activeOrg?.slug || ''}
         onChange={(e) => handleSelect(e.target.value)}
-        className="w-full rounded-lg border border-[#d8d0c1] bg-white px-3 py-2 text-sm text-[#171512] shadow-sm outline-none transition focus:border-[#0f766e] focus:ring-1 focus:ring-[#0f766e]"
+        className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground shadow-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
       >
         {orgs.map((org) => (
           <option key={org.id} value={org.slug}>

@@ -41,31 +41,31 @@ function NodeConfigSummary({ config }: { config: NodeConfig }) {
   }, [config.name, config.location, config.model]);
 
   return (
-    <div className="border-t border-[#ece5d8] px-5 py-4" data-testid="qr-config-summary">
-      <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#6f5f48]">
+    <div className="border-t border-table-divider px-5 py-4" data-testid="qr-config-summary">
+      <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
         Node Configuration
       </h3>
       <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
-          <dt className="text-xs text-[#6f5f48]">Name</dt>
+          <dt className="text-xs text-muted">Name</dt>
           <dd
-            className="mt-0.5 text-sm font-medium text-[#171512]"
+            className="mt-0.5 text-sm font-medium text-foreground"
             data-testid="qr-config-name"
             dangerouslySetInnerHTML={{ __html: safeName }}
           />
         </div>
         <div>
-          <dt className="text-xs text-[#6f5f48]">Location</dt>
+          <dt className="text-xs text-muted">Location</dt>
           <dd
-            className="mt-0.5 text-sm font-medium text-[#171512]"
+            className="mt-0.5 text-sm font-medium text-foreground"
             data-testid="qr-config-location"
             dangerouslySetInnerHTML={{ __html: safeLocation }}
           />
         </div>
         <div>
-          <dt className="text-xs text-[#6f5f48]">Model</dt>
+          <dt className="text-xs text-muted">Model</dt>
           <dd
-            className="mt-0.5 text-sm font-medium text-[#171512]"
+            className="mt-0.5 text-sm font-medium text-foreground"
             data-testid="qr-config-model"
             dangerouslySetInnerHTML={{ __html: safeModel }}
           />
@@ -172,14 +172,14 @@ export function QRProvisionPanel({
       ? "text-rose-600"
       : remainingMs < 180_000
         ? "text-amber-600"
-        : "text-[#0f766e]";
+        : "text-primary";
 
   if (!nodeConfig) {
     return (
-      <section className="rounded-lg border border-[#d8d0c1] bg-white p-6">
+      <section className="rounded-lg border border-border bg-surface p-6">
         <div className="flex flex-col items-center gap-3 py-12 text-center">
           <svg
-            className="h-12 w-12 text-[#cfc4b1]"
+            className="h-12 w-12 text-border-light"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -192,7 +192,7 @@ export function QRProvisionPanel({
               d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
             />
           </svg>
-          <p className="text-sm font-medium text-[#6f5f48]">
+          <p className="text-sm font-medium text-muted">
             Configure node settings to generate a provisioning QR code.
           </p>
         </div>
@@ -202,10 +202,10 @@ export function QRProvisionPanel({
 
   if (!token && !loading && !error) {
     return (
-      <section className="rounded-lg border border-[#d8d0c1] bg-white p-6">
+      <section className="rounded-lg border border-border bg-surface p-6">
         <div className="flex flex-col items-center gap-3 py-12 text-center">
           <svg
-            className="h-12 w-12 text-[#cfc4b1]"
+            className="h-12 w-12 text-border-light"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -218,7 +218,7 @@ export function QRProvisionPanel({
               d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
             />
           </svg>
-          <p className="text-sm font-medium text-[#6f5f48]">
+          <p className="text-sm font-medium text-muted">
             Connect your wallet to generate a provisioning QR code.
           </p>
         </div>
@@ -227,14 +227,14 @@ export function QRProvisionPanel({
   }
 
   return (
-    <section className="rounded-lg border border-[#d8d0c1] bg-white">
+    <section className="rounded-lg border border-border bg-surface">
       {/* Header */}
-      <div className="flex flex-col gap-3 border-b border-[#d8d0c1] p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-[#171512]">
+          <h2 className="text-lg font-semibold text-foreground">
             Provisioning QR Code
           </h2>
-          <p className="mt-0.5 text-sm text-[#6f5f48]">
+          <p className="mt-0.5 text-sm text-muted">
             Scan with router camera to auto-configure node on-chain
           </p>
         </div>
@@ -242,7 +242,7 @@ export function QRProvisionPanel({
           type="button"
           onClick={handleRefresh}
           disabled={loading || isRefreshing}
-          className="inline-flex items-center gap-2 rounded-md border border-[#cfc4b1] px-3 py-1.5 text-sm font-medium text-[#3e3830] transition hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-md border border-border-light px-3 py-1.5 text-sm font-medium text-muted-text transition hover:border-primary hover:text-primary disabled:opacity-50"
         >
           {isRefreshing || loading ? (
             <svg
@@ -286,7 +286,7 @@ export function QRProvisionPanel({
         <canvas
           ref={canvasRef}
           data-testid="qr-canvas"
-          className="rounded-lg border border-[#ece5d8] bg-white"
+          className="rounded-lg border border-table-divider bg-surface"
           style={{ width: 280, height: 280 }}
           aria-label="Provisioning QR code"
         />
@@ -298,7 +298,7 @@ export function QRProvisionPanel({
         >
           <div className="flex items-center gap-2">
             <span
-              className={`text-sm font-medium text-[#6f5f48]`}
+              className={`text-sm font-medium text-muted`}
             >
               {isExpired ? "Refreshing..." : "Valid for"}
             </span>
@@ -309,10 +309,10 @@ export function QRProvisionPanel({
               {formatTimeRemaining(remainingMs)}
             </span>
           </div>
-          <div className="h-2 w-48 rounded-full bg-[#ece5d8]">
+          <div className="h-2 w-48 rounded-full bg-surface-alt">
             <div
               className={`h-2 rounded-full transition-all duration-1000 ${
-                isExpired ? "bg-rose-400" : "bg-[#0f766e]"
+                isExpired ? "bg-rose-400" : "bg-primary"
               }`}
               style={{
                 width: `${Math.max(0, Math.min(100, (remainingMs / PROVISION_TOKEN_TTL_MS) * 100))}%`,
@@ -328,12 +328,12 @@ export function QRProvisionPanel({
       )}
 
       {/* Provisioning log */}
-      <div className="border-t border-[#ece5d8] px-5 py-4">
-        <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#6f5f48]">
+      <div className="border-t border-table-divider px-5 py-4">
+        <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
           Provisioning Log
         </h3>
         {logEntries.length === 0 ? (
-          <p className="py-4 text-center text-sm text-[#6f5f48]">
+          <p className="py-4 text-center text-sm text-muted">
             No provisioning attempts recorded yet.
           </p>
         ) : (
@@ -364,7 +364,7 @@ export function QRProvisionPanel({
               return (
                 <div
                   key={entry.id}
-                  className="flex items-center justify-between gap-3 rounded-md border border-[#ece5d8] px-3 py-2"
+                  className="flex items-center justify-between gap-3 rounded-md border border-table-divider px-3 py-2"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
@@ -373,11 +373,11 @@ export function QRProvisionPanel({
                       >
                         {label}
                       </span>
-                      <span className="truncate text-xs font-medium text-[#171512]">
+                      <span className="truncate text-xs font-medium text-foreground">
                         {entry.nodeConfig.name}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-[10px] text-[#6f5f48]">
+                    <p className="mt-0.5 text-[10px] text-muted">
                       {new Date(entry.createdAt).toLocaleString(undefined, {
                         month: "short",
                         day: "numeric",

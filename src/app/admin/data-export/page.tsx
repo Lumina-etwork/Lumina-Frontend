@@ -29,45 +29,45 @@ export default function DataExportPage() {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-3xl font-bold text-foreground">
           Data Export
         </h1>
-        <p className="text-gray-600 dark:text-gray-300 mt-2">
+        <p className="text-muted mt-2">
           Export node telemetry data with streaming support
         </p>
       </header>
 
-      <main className="bg-white dark:bg-gray-800 border rounded-xl p-6 shadow-sm">
+      <main className="bg-surface border rounded-xl p-6 shadow-sm">
         {state.status === 'idle' || state.status === 'complete' || state.status === 'aborted' || state.status === 'error' ? (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted mb-2">
                   Start Date
                 </label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-border-light rounded-lg bg-surface-alt text-foreground"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted mb-2">
                   End Date
                 </label>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-border-light rounded-lg bg-surface-alt text-foreground"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted mb-2">
                 Export Format
               </label>
               <div className="flex gap-4">
@@ -99,14 +99,14 @@ export default function DataExportPage() {
             <div className="flex gap-4">
               <button
                 onClick={handleStartExport}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="px-6 py-3 bg-primary text-primary-text rounded-lg font-medium hover:bg-primary-hover transition-colors"
               >
                 Start Export
               </button>
               {(state.status === 'complete' || state.status === 'aborted' || state.status === 'error') && (
                 <button
                   onClick={reset}
-                  className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                  className="px-6 py-3 bg-surface-alt text-muted-text rounded-lg font-medium hover:bg-border transition-colors"
                 >
                   Reset
                 </button>

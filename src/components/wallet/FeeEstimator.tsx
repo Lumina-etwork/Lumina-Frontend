@@ -26,13 +26,13 @@ function SkeletonRow() {
   return (
     <tr>
       <td className="fee-table-cell">
-        <div className="h-3.5 w-28 animate-pulse rounded bg-[#ece5d8]" />
+        <div className="h-3.5 w-28 animate-pulse rounded bg-surface-alt" />
       </td>
       <td className="fee-table-cell">
-        <div className="h-3.5 w-20 animate-pulse rounded bg-[#ece5d8]" />
+        <div className="h-3.5 w-20 animate-pulse rounded bg-surface-alt" />
       </td>
       <td className="fee-table-cell text-right">
-        <div className="ml-auto h-3.5 w-24 animate-pulse rounded bg-[#ece5d8]" />
+        <div className="ml-auto h-3.5 w-24 animate-pulse rounded bg-surface-alt" />
       </td>
     </tr>
   );
@@ -45,7 +45,7 @@ function FeeTableSkeleton() {
         <div className="flex items-center gap-2">
           {/* spinner */}
           <svg
-            className="h-4 w-4 animate-spin text-[#0f766e]"
+            className="h-4 w-4 animate-spin text-primary"
             viewBox="0 0 24 24"
             fill="none"
             aria-hidden="true"
@@ -194,9 +194,9 @@ function FeeTable({ estimate }: { estimate: FeeBreakdown }) {
       <tbody>
         {rows.map((row) => (
           <tr key={row.label} className="fee-table-row">
-            <td className="fee-table-cell font-medium text-[#3e3830]">{row.label}</td>
-            <td className="fee-table-cell tabular-nums text-[#6f5f48]">{row.units}</td>
-            <td className="fee-table-cell text-right tabular-nums text-[#171512]">
+            <td className="fee-table-cell font-medium text-muted-text">{row.label}</td>
+            <td className="fee-table-cell tabular-nums text-muted">{row.units}</td>
+            <td className="fee-table-cell text-right tabular-nums text-foreground">
               {formatFeeXlm(row.fee)}
             </td>
           </tr>
@@ -204,9 +204,9 @@ function FeeTable({ estimate }: { estimate: FeeBreakdown }) {
       </tbody>
       <tfoot>
         <tr className="fee-table-total">
-          <td className="fee-table-cell font-semibold text-[#171512]">Total</td>
+          <td className="fee-table-cell font-semibold text-foreground">Total</td>
           <td className="fee-table-cell" />
-          <td className="fee-table-cell text-right font-semibold tabular-nums text-[#0f766e]">
+          <td className="fee-table-cell text-right font-semibold tabular-nums text-primary">
             {formatFeeXlm(totalFee)}
           </td>
         </tr>
@@ -283,7 +283,7 @@ export function FeeEstimator({ txXdr, onSimulationResult }: FeeEstimatorProps) {
           <svg
             viewBox="0 0 16 16"
             fill="none"
-            className="h-4 w-4 text-[#0f766e]"
+            className="h-4 w-4 text-primary"
             aria-hidden="true"
           >
             <path
@@ -312,15 +312,15 @@ export function FeeEstimator({ txXdr, onSimulationResult }: FeeEstimatorProps) {
 
       {/* Confidence range */}
       <div className="fee-range-row">
-        <span className="text-xs text-[#6f5f48]">Estimated range:</span>
-        <span className="text-xs font-medium tabular-nums text-[#3e3830]">
+        <span className="text-xs text-muted">Estimated range:</span>
+        <span className="text-xs font-medium tabular-nums text-muted-text">
           {formatFeeXlm(estimate.minFee)} – {formatFeeXlm(estimate.maxFee)}
         </span>
       </div>
 
       {/* Re-estimation hint while a background re-validate runs */}
       {loading && (
-        <p className="mt-2 text-center text-[10px] text-[#9b8a6f]" aria-live="polite">
+        <p className="mt-2 text-center text-[10px] text-muted" aria-live="polite">
           Re-validating estimate…
         </p>
       )}
