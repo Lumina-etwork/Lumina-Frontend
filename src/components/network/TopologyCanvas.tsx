@@ -49,6 +49,15 @@ export interface TopologyCanvasProps {
 // Canvas 2D rendering (fallback path)
 // ---------------------------------------------------------------------------
 
+function resolveThemeColor(varName: string, fallback: string): string {
+  try {
+    const val = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+    return val || fallback
+  } catch {
+    return fallback
+  }
+}
+
 function renderCanvas2D(
   ctx: CanvasRenderingContext2D,
   nodes: TopologyCanvasNode[],
@@ -58,10 +67,14 @@ function renderCanvas2D(
 ): void {
   ctx.clearRect(0, 0, width, height);
 
+  const edgeColor = resolveThemeColor('--color-border', '#94a3b8');
+  const defaultNodeColor = resolveThemeColor('--color-primary', '#0f766e');
+  const labelColor = resolveThemeColor('--color-text', '#171512');
+
   // Draw edges
   if (edges.length > 0) {
     const nodeMap = new Map(nodes.map((n) => [n.id, n]));
-    ctx.strokeStyle = '#94a3b8';
+    ctx.strokeStyle = edgeColor;
     ctx.lineWidth = 1;
     for (const e of edges) {
       const src = nodeMap.get(e.source);
@@ -79,12 +92,12 @@ function renderCanvas2D(
     const radius = n.r ?? 3;
     ctx.beginPath();
     ctx.arc(n.x, n.y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = n.color ?? '#0f766e';
+    ctx.fillStyle = n.color ?? defaultNodeColor;
     ctx.fill();
   }
 
   // Draw labels for larger nodes
-  ctx.fillStyle = '#171512';
+  ctx.fillStyle = labelColor;
   ctx.font = '10px sans-serif';
   ctx.textAlign = 'center';
   for (const n of nodes) {

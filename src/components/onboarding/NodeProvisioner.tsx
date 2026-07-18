@@ -100,13 +100,13 @@ export function NodeProvisioner() {
     <main className="mx-auto w-full max-w-3xl px-5 py-8 sm:px-8">
       {/* Page header */}
       <header className="mb-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#6f5f48]">
+        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-muted">
           Edge Router Provisioning
         </p>
-        <h1 className="mt-2 text-3xl font-semibold text-[#171512] sm:text-4xl">
+        <h1 className="mt-2 text-3xl font-semibold text-foreground sm:text-4xl">
           Node Onboarding
         </h1>
-        <p className="mt-3 text-sm leading-relaxed text-[#6f5f48]">
+        <p className="mt-3 text-sm leading-relaxed text-muted">
           Configure a new edge router and generate a secure QR code for
           automatic on-chain provisioning. Scan the QR code with the router
           camera to claim the node and apply deployment settings instantly.
@@ -114,7 +114,7 @@ export function NodeProvisioner() {
       </header>
 
       {/* Wallet status */}
-      <div className="mb-6 rounded-md border border-[#ece5d8] bg-[#fafaf7] px-4 py-3">
+      <div className="mb-6 rounded-md border border-table-divider bg-surface-alt px-4 py-3">
         <div className="flex items-center gap-2">
           <span
             className={`inline-block h-2.5 w-2.5 rounded-full ${
@@ -122,7 +122,7 @@ export function NodeProvisioner() {
             }`}
             aria-hidden="true"
           />
-          <span className="text-sm font-medium text-[#171512]">
+          <span className="text-sm font-medium text-foreground">
             {isWalletReady
               ? `Wallet connected: ${publicKey!.slice(0, 8)}...${publicKey!.slice(-4)}`
               : "Wallet not connected — connect your Freighter wallet to proceed"}
@@ -134,9 +134,9 @@ export function NodeProvisioner() {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="mb-8 rounded-lg border border-[#d8d0c1] bg-white p-5"
+        className="mb-8 rounded-lg border border-border bg-surface p-5"
       >
-        <h2 className="mb-4 text-lg font-semibold text-[#171512]">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">
           Node Configuration
         </h2>
 
@@ -145,7 +145,7 @@ export function NodeProvisioner() {
           <div>
             <label
               htmlFor="node-name"
-              className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[#3e3830]"
+              className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-muted-text"
             >
               Node Name
             </label>
@@ -158,10 +158,10 @@ export function NodeProvisioner() {
               onChange={(e) => handleFieldChange("name", e.target.value)}
               placeholder="e.g. nyc-edge-01"
               disabled={!isWalletReady}
-              className={`w-full rounded-md border px-3 py-2 text-sm text-[#171512] placeholder-[#cfc4b1] transition focus:outline-none focus:ring-2 focus:ring-[#0f766e]/30 disabled:cursor-not-allowed disabled:bg-[#fafaf7] ${
+              className={`w-full rounded-md border px-3 py-2 text-sm text-foreground placeholder-border-light transition focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:bg-surface-alt ${
                 formErrors.name
                   ? "border-rose-300 focus:ring-rose-300"
-                  : "border-[#cfc4b1]"
+                  : "border-border-light"
               }`}
             />
             {formErrors.name && (
@@ -175,7 +175,7 @@ export function NodeProvisioner() {
           <div>
             <label
               htmlFor="node-location"
-              className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[#3e3830]"
+              className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-muted-text"
             >
               Location
             </label>
@@ -188,10 +188,10 @@ export function NodeProvisioner() {
               onChange={(e) => handleFieldChange("location", e.target.value)}
               placeholder="e.g. New York, US"
               disabled={!isWalletReady}
-              className={`w-full rounded-md border px-3 py-2 text-sm text-[#171512] placeholder-[#cfc4b1] transition focus:outline-none focus:ring-2 focus:ring-[#0f766e]/30 disabled:cursor-not-allowed disabled:bg-[#fafaf7] ${
+              className={`w-full rounded-md border px-3 py-2 text-sm text-foreground placeholder-border-light transition focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:bg-surface-alt ${
                 formErrors.location
                   ? "border-rose-300 focus:ring-rose-300"
-                  : "border-[#cfc4b1]"
+                  : "border-border-light"
               }`}
             />
             {formErrors.location && (
@@ -205,7 +205,7 @@ export function NodeProvisioner() {
           <div>
             <label
               htmlFor="node-model"
-              className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[#3e3830]"
+              className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-muted-text"
             >
               Model
             </label>
@@ -218,10 +218,10 @@ export function NodeProvisioner() {
               onChange={(e) => handleFieldChange("model", e.target.value)}
               placeholder="e.g. Lumina LR-200"
               disabled={!isWalletReady}
-              className={`w-full rounded-md border px-3 py-2 text-sm text-[#171512] placeholder-[#cfc4b1] transition focus:outline-none focus:ring-2 focus:ring-[#0f766e]/30 disabled:cursor-not-allowed disabled:bg-[#fafaf7] ${
+              className={`w-full rounded-md border px-3 py-2 text-sm text-foreground placeholder-border-light transition focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:bg-surface-alt ${
                 formErrors.model
                   ? "border-rose-300 focus:ring-rose-300"
-                  : "border-[#cfc4b1]"
+                  : "border-border-light"
               }`}
             />
             {formErrors.model && (
@@ -232,8 +232,8 @@ export function NodeProvisioner() {
           </div>
         </div>
 
-        <div className="mt-5 flex items-center justify-between border-t border-[#ece5d8] pt-4">
-          <p className="text-xs text-[#6f5f48]">
+        <div className="mt-5 flex items-center justify-between border-t border-table-divider pt-4">
+          <p className="text-xs text-muted">
             {submitted
               ? "Configuration saved. QR code generated below."
               : "Fill in all fields and click Generate to create a provisioning QR code."}
@@ -242,7 +242,7 @@ export function NodeProvisioner() {
             type="submit"
             data-testid="generate-qr-button"
             disabled={!isWalletReady}
-            className="rounded-md bg-[#0f766e] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#115e59] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-text transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitted ? "Regenerate" : "Generate QR Code"}
           </button>

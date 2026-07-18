@@ -93,11 +93,11 @@ function buildCardMetadata(node: NodePosition): NodeCardMetadata {
 function MetadataRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4 py-1.5">
-      <dt className="shrink-0 text-xs font-medium uppercase tracking-[0.08em] text-[#6f5f48]">
+      <dt className="shrink-0 text-xs font-medium uppercase tracking-[0.08em] text-muted">
         {label}
       </dt>
       <dd
-        className="text-right text-xs text-[#171512]"
+        className="text-right text-xs text-foreground"
         // sanitized value is safe to render as HTML for allowed tags like <b>, <i>, <a>
         dangerouslySetInnerHTML={{ __html: value }}
       />
@@ -135,10 +135,10 @@ export function NodeCard({
     <article
       data-testid="node-card"
       data-node-id={node.id}
-      className={`rounded-lg border bg-white shadow-sm transition ${
+      className={`rounded-lg border bg-surface shadow-sm transition ${
         isSelected
-          ? 'border-[#0f766e] ring-1 ring-[#0f766e]/20'
-          : 'border-[#d8d0c1] hover:border-[#cfc4b1]'
+          ? 'border-primary ring-1 ring-primary/20'
+          : 'border-border hover:border-border-light'
       } ${className}`}
       onClick={() => onClick?.(node)}
       onKeyDown={(e) => {
@@ -152,7 +152,7 @@ export function NodeCard({
       aria-label={`Node: ${(node.label ?? node.id).replace(/<[^>]*>/g, '')}`}
     >
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 border-b border-[#ece5d8] px-4 py-3">
+      <div className="flex items-start justify-between gap-3 border-b border-table-divider px-4 py-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             {/* Node color indicator */}
@@ -164,12 +164,12 @@ export function NodeCard({
               aria-hidden="true"
             />
             <h3
-              className="truncate text-sm font-semibold text-[#171512]"
+              className="truncate text-sm font-semibold text-foreground"
               // Safe HTML rendering for allowed tags (b, i, a)
               dangerouslySetInnerHTML={{ __html: safeLabel }}
             />
           </div>
-          <p className="mt-0.5 truncate font-mono text-[10px] text-[#9b8a6f]">
+          <p className="mt-0.5 truncate font-mono text-[10px] text-muted">
             {node.id}
           </p>
         </div>
@@ -177,7 +177,7 @@ export function NodeCard({
         {onDismiss && (
           <button
             type="button"
-            className="shrink-0 rounded p-1 text-[#9b8a6f] transition hover:bg-[#f7f4ee] hover:text-[#171512]"
+            className="shrink-0 rounded p-1 text-muted transition hover:bg-background hover:text-foreground"
             onClick={(e) => {
               e.stopPropagation()
               onDismiss(node.id)
@@ -193,7 +193,7 @@ export function NodeCard({
 
       {/* Metadata fields */}
       {hasMetadata ? (
-        <dl className="divide-y divide-[#f7f4ee] px-4 py-2">
+        <dl className="divide-y divide-background px-4 py-2">
           {metadata.description && (
             <MetadataRow label="Description" value={metadata.description} />
           )}
@@ -217,14 +217,14 @@ export function NodeCard({
           )}
         </dl>
       ) : (
-        <div className="px-4 py-3 text-center text-xs text-[#9b8a6f]">
+        <div className="px-4 py-3 text-center text-xs text-muted">
           No additional metadata available.
         </div>
       )}
 
       {/* Coordinates (non-sensitive, always display) */}
-      <div className="border-t border-[#ece5d8] px-4 py-2">
-        <div className="flex gap-4 text-[10px] text-[#9b8a6f]">
+      <div className="border-t border-table-divider px-4 py-2">
+        <div className="flex gap-4 text-[10px] text-muted">
           <span>x: {node.x.toFixed(0)}</span>
           <span>y: {node.y.toFixed(0)}</span>
           {node.z != null && <span>z: {node.z.toFixed(1)}</span>}

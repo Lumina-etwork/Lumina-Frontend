@@ -60,9 +60,20 @@ export function ThroughputChart({
   title = 'Network Throughput',
   height = 400,
   enablePerformanceTracking = false,
-  lineColor = '#0f766e',
-  gridColor = '#e5e7eb',
+  lineColor,
+  gridColor,
 }: ThroughputChartProps) {
+  const chartColors = useMemo(() => {
+    if (typeof window === 'undefined') return { text: '#6f5f48', border: '#d8d0c1', surface: '#ffffff', grid: '#e5e7eb' }
+    const s = getComputedStyle(document.documentElement)
+    return {
+      text: s.getPropertyValue('--color-chart-text').trim(),
+      border: s.getPropertyValue('--color-chart-border').trim(),
+      surface: s.getPropertyValue('--color-surface').trim(),
+      grid: s.getPropertyValue('--color-chart-grid').trim(),
+    }
+  }, [])
+
   // Sliding window to maintain max 200 data points
   const slidingWindowRef = useRef(
     new SlidingWindow<ChartDataPoint>(200)
@@ -165,12 +176,12 @@ export function ThroughputChart({
   }, [])
 
   return (
-    <div className="rounded-lg border border-[#d8d0c1] bg-white p-4">
+    <div className="rounded-lg border border-border bg-surface p-4">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-[#1a1410]">{title}</h3>
-          <div className="mt-1 flex items-center gap-4 text-xs text-[#6f5f48]">
+          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+          <div className="mt-1 flex items-center gap-4 text-xs text-muted">
             <span className="flex items-center gap-1">
               <span
                 className={`inline-block h-2 w-2 rounded-full ${
@@ -211,25 +222,25 @@ export function ThroughputChart({
           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
           <XAxis
             dataKey="time"
-            tick={{ fontSize: 12, fill: '#6f5f48' }}
-            tickLine={{ stroke: '#d8d0c1' }}
+            tick={{ fontSize: 12, fill: chartColors.text }}
+            tickLine={{ stroke: chartColors.border }}
           />
           <YAxis
             tickFormatter={formatYAxis}
-            tick={{ fontSize: 12, fill: '#6f5f48' }}
-            tickLine={{ stroke: '#d8d0c1' }}
+            tick={{ fontSize: 12, fill: chartColors.text }}
+            tickLine={{ stroke: chartColors.border }}
             label={{
               value: 'Throughput (packets/s)',
               angle: -90,
               position: 'insideLeft',
-              style: { fontSize: 12, fill: '#6f5f48' },
+              style: { fontSize: 12, fill: chartColors.text },
             }}
           />
           <Tooltip
             formatter={formatTooltip}
             contentStyle={{
-              backgroundColor: '#ffffff',
-              border: '1px solid #d8d0c1',
+              backgroundColor: chartColors.surface,
+              border: `1px solid ${chartColors.border}`,
               borderRadius: '6px',
               fontSize: '12px',
             }}
@@ -252,42 +263,42 @@ export function ThroughputChart({
 
       {/* Footer stats */}
       {chartData.length > 0 && (
-        <div className="mt-4 grid grid-cols-3 gap-4 border-t border-[#ece5d8] pt-4">
+        <div className="mt-4 grid grid-cols-3 gap-4 border-t border-table-divider pt-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#6f5f48]">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
               Current
             </p>
-            <p className="mt-1 text-lg font-semibold text-[#1a1410]">
+            <p className="mt-1 text-lg font-semibold text-foreground">
               {chartData[chartData.length - 1]?.throughput.toFixed(2)}
             </p>
-            <p className="text-xs text-[#6f5f48]">packets/s</p>
+            <p className="text-xs text-muted">packets/s</p>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#6f5f48]">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
               Average
             </p>
-            <p className="mt-1 text-lg font-semibold text-[#1a1410]">
+            <p className="mt-1 text-lg font-semibold text-foreground">
               {(
                 chartData.reduce((sum, d) => sum + d.throughput, 0) / chartData.length
               ).toFixed(2)}
             </p>
-            <p className="text-xs text-[#6f5f48]">packets/s</p>
+            <p className="text-xs text-muted">packets/s</p>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#6f5f48]">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
               Peak
             </p>
-            <p className="mt-1 text-lg font-semibold text-[#1a1410]">
+            <p className="mt-1 text-lg font-semibold text-foreground">
               {Math.max(...chartData.map((d) => d.throughput)).toFixed(2)}
             </p>
-            <p className="text-xs text-[#6f5f48]">packets/s</p>
+            <p className="text-xs text-muted">packets/s</p>
           </div>
         </div>
       )}
 
       {/* No data message */}
       {chartData.length === 0 && (
-        <div className="flex items-center justify-center py-20 text-sm text-[#6f5f48]">
+        <div className="flex items-center justify-center py-20 text-sm text-muted">
           {state === 'connecting' ? 'Connecting to data stream...' : 'Waiting for data...'}
         </div>
       )}

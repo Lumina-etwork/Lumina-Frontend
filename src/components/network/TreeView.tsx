@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { easeCubicInOut } from "d3-ease";
 import { configureTreeLayout } from "../../lib/d3/treeLayout";
 
 interface TreeViewProps {
@@ -9,11 +8,18 @@ interface TreeViewProps {
   height?: number;
 }
 
-const STATUS_COLORS = {
-  healthy: "#10B981", // Tailwind emerald-500
-  warning: "#F59E0B", // Tailwind amber-500
-  critical: "#EF4444", // Tailwind red-500
-};
+function getThemeColor(varName: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+}
+
+function resolveStatusColor(status: string): string {
+  const map: Record<string, string> = {
+    healthy: getThemeColor('--color-status-healthy'),
+    warning: getThemeColor('--color-status-warning'),
+    critical: getThemeColor('--color-status-critical'),
+  }
+  return map[status] || getThemeColor('--color-muted')
+}
 
 export const TreeView: React.FC<TreeViewProps> = ({
   data,
@@ -102,9 +108,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .attr("r", 1e-6)
         .style(
           "fill",
-          (d: any) =>
-            STATUS_COLORS[d.data.status as keyof typeof STATUS_COLORS] ||
-            "#6B7280",
+          (d: any) => resolveStatusColor(d.data.status),
         );
 
       nodeEnter
@@ -118,14 +122,14 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .style("fill-opacity", 1e-6)
         .style("font-size", "12px")
         .style("user-select", "none")
-        .attr("class", "fill-slate-700 dark:fill-slate-200 font-medium");
+        .attr("class", "fill-foreground font-medium");
 
       // Update phase: Smoothly transition nodes to their newly calculated positions
       const nodeUpdate = node
         .merge(nodeEnter as any)
         .transition()
         .duration(400)
-        .ease(easeCubicInOut)
+        .ease(d3.easeCubicInOut)
         .attr("transform", (d: any) => `translate(${d.y},${d.x})`);
 
       nodeUpdate
@@ -133,10 +137,9 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .attr("r", 7)
         .style(
           "fill",
-          (d: any) =>
-            STATUS_COLORS[d.data.status as keyof typeof STATUS_COLORS],
+          (d: any) => resolveStatusColor(d.data.status),
         )
-        .style("stroke", "#fff")
+        .style("stroke", () => getThemeColor('--color-surface'))
         .style("stroke-width", "2px");
 
       nodeUpdate.select("text").style("fill-opacity", 1);
@@ -148,8 +151,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .duration(200)
         .style(
           "fill",
-          (d: any) =>
-            STATUS_COLORS[d.data.status as keyof typeof STATUS_COLORS],
+          (d: any) => resolveStatusColor(d.data.status),
         );
 
       // Exit phase: Transition departing nodes back to the clicked parent node
@@ -157,7 +159,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .exit()
         .transition()
         .duration(400)
-        .ease(easeCubicInOut)
+        .ease(d3.easeCubicInOut)
         .attr("transform", () => `translate(${source.y},${source.x})`)
         .remove();
 
@@ -185,7 +187,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
           return diagonal({ source: o, target: o } as any);
         })
         .style("fill", "none")
-        .style("stroke", "#CBD5E1")
+        .style("stroke", () => getThemeColor('--color-border'))
         .style("stroke-width", "1.5px");
 
       // Update phase: Standard view transitions for expanding paths
@@ -193,7 +195,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .merge(linkEnter as any)
         .transition()
         .duration(400)
-        .ease(easeCubicInOut)
+        .ease(d3.easeCubicInOut)
         .attr("d", diagonal as any);
 
       // Exit phase: Contract links back down into structural parent node
@@ -201,7 +203,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
         .exit()
         .transition()
         .duration(400)
-        .ease(easeCubicInOut)
+        .ease(d3.easeCubicInOut)
         .attr("d", () => {
           const o = { x: source.x, y: source.y };
           return diagonal({ source: o, target: o } as any);
@@ -217,7 +219,7 @@ export const TreeView: React.FC<TreeViewProps> = ({
   }, [data, width, height]);
 
   return (
-    <div className="w-full h-full border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900">
+    <div className="w-full h-full border border-border rounded-xl overflow-hidden bg-surface">
       <svg
         ref={svgRef}
         width={width}

@@ -14,9 +14,9 @@
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--skeleton-base, #e2ded7) 25%,
-    var(--skeleton-shine, #f5f2ed) 50%,
-    var(--skeleton-base, #e2ded7) 75%
+    var(--color-skeleton-base) 25%,
+    var(--color-skeleton-shine) 50%,
+    var(--color-skeleton-base) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite linear;
@@ -40,14 +40,14 @@
 
 .skeleton-card {
   border-radius: 8px;
-  border: 1px solid var(--skeleton-border, #d8d0c1);
-  background: var(--skeleton-card-bg, #ffffff);
+  border: 1px solid var(--color-skeleton-border);
+  background: var(--color-skeleton-card-bg);
   overflow: hidden;
 }
 
 .skeleton-card-header {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--skeleton-border, #d8d0c1);
+  border-bottom: 1px solid var(--color-skeleton-border);
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -57,7 +57,7 @@
 .skeleton-card-body { padding: 8px 16px; }
 .skeleton-card-footer {
   padding: 8px 16px;
-  border-top: 1px solid var(--skeleton-border, #d8d0c1);
+  border-top: 1px solid var(--color-skeleton-border);
 }
 
 .skeleton-circle { border-radius: 50%; aspect-ratio: 1; }
@@ -65,7 +65,7 @@
 .skeleton-chart-bar { border-radius: 2px; }
 .skeleton-chart-wave {
   fill: none;
-  stroke: var(--skeleton-base, #e2ded7);
+  stroke: var(--color-skeleton-base);
   stroke-width: 2;
 }
 
@@ -75,7 +75,7 @@
   justify-content: center;
   gap: 8px;
   padding: 16px;
-  color: var(--color-text-secondary, #6f5f48);
+  color: var(--color-text-secondary);
   font-size: 0.8125rem;
   animation: skeleton-fade-in 0.3s ease-in;
 }
@@ -90,6 +90,7 @@
   --color-text: #171512;
   --color-text-secondary: #6f5f48;
   --color-text-tertiary: #3e3830;
+  --color-text-placeholder: #9b8a6f;
   --color-border: #d8d0c1;
   --color-border-light: #cfc4b1;
   --color-surface: #ffffff;
@@ -113,6 +114,19 @@
   --color-table-header-bg: #faf8f3;
   --color-table-divider: #ece5d8;
   --focus-ring-color: #0f766e;
+  --color-skeleton-base: #e2ded7;
+  --color-skeleton-shine: #f5f2ed;
+  --color-skeleton-border: #d8d0c1;
+  --color-skeleton-card-bg: #ffffff;
+  --color-chart-bg: #ffffff;
+  --color-chart-grid: #e5e7eb;
+  --color-chart-text: #6f5f48;
+  --color-chart-border: #d8d0c1;
+  --color-status-healthy: #10b981;
+  --color-status-warning: #f59e0b;
+  --color-status-critical: #ef4444;
+  --color-error-border: #fecaca;
+  --color-error-bg: #fff5f5;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -121,6 +135,7 @@
     --color-text: #ededed;
     --color-text-secondary: #a3a3a3;
     --color-text-tertiary: #d4d4d4;
+    --color-text-placeholder: #737373;
     --color-border: #262626;
     --color-border-light: #404040;
     --color-surface: #171717;
@@ -144,6 +159,19 @@
     --color-table-header-bg: #1a1a1a;
     --color-table-divider: #262626;
     --focus-ring-color: #2dd4bf;
+    --color-skeleton-base: #262626;
+    --color-skeleton-shine: #404040;
+    --color-skeleton-border: #404040;
+    --color-skeleton-card-bg: #171717;
+    --color-chart-bg: #171717;
+    --color-chart-grid: #404040;
+    --color-chart-text: #a3a3a3;
+    --color-chart-border: #404040;
+    --color-status-healthy: #34d399;
+    --color-status-warning: #fbbf24;
+    --color-status-critical: #f87171;
+    --color-error-border: #7f1d1d;
+    --color-error-bg: #1c0a0a;
   }
 }
 
@@ -152,6 +180,7 @@
   --color-text: #ededed;
   --color-text-secondary: #a3a3a3;
   --color-text-tertiary: #d4d4d4;
+  --color-text-placeholder: #737373;
   --color-border: #262626;
   --color-border-light: #404040;
   --color-surface: #171717;
@@ -175,6 +204,19 @@
   --color-table-header-bg: #1a1a1a;
   --color-table-divider: #262626;
   --focus-ring-color: #2dd4bf;
+  --color-skeleton-base: #262626;
+  --color-skeleton-shine: #404040;
+  --color-skeleton-border: #404040;
+  --color-skeleton-card-bg: #171717;
+  --color-chart-bg: #171717;
+  --color-chart-grid: #404040;
+  --color-chart-text: #a3a3a3;
+  --color-chart-border: #404040;
+  --color-status-healthy: #34d399;
+  --color-status-warning: #fbbf24;
+  --color-status-critical: #f87171;
+  --color-error-border: #7f1d1d;
+  --color-error-bg: #1c0a0a;
 }
 
 .solar {
@@ -182,6 +224,7 @@
   --color-text: #000000;
   --color-text-secondary: #1a1a1a;
   --color-text-tertiary: #2a2a2a;
+  --color-text-placeholder: #555555;
   --color-border: #666666;
   --color-border-light: #999999;
   --color-surface: #f5f5f5;
@@ -205,6 +248,19 @@
   --color-table-header-bg: #e0e0e0;
   --color-table-divider: #cccccc;
   --focus-ring-color: #000000;
+  --color-skeleton-base: #d0d0d0;
+  --color-skeleton-shine: #e8e8e8;
+  --color-skeleton-border: #999999;
+  --color-skeleton-card-bg: #f5f5f5;
+  --color-chart-bg: #f5f5f5;
+  --color-chart-grid: #cccccc;
+  --color-chart-text: #1a1a1a;
+  --color-chart-border: #999999;
+  --color-status-healthy: #10b981;
+  --color-status-warning: #f59e0b;
+  --color-status-critical: #ef4444;
+  --color-error-border: #fecaca;
+  --color-error-bg: #fff5f5;
 }
 
 @theme inline {
@@ -212,6 +268,7 @@
   --color-foreground: var(--color-text);
   --color-muted: var(--color-text-secondary);
   --color-muted-text: var(--color-text-tertiary);
+  --color-placeholder: var(--color-text-placeholder);
   --color-border: var(--color-border);
   --color-border-light: var(--color-border-light);
   --color-surface: var(--color-surface);
@@ -235,6 +292,19 @@
   --color-table-header-bg: var(--color-table-header-bg);
   --color-table-divider: var(--color-table-divider);
   --color-focus-ring: var(--focus-ring-color);
+  --color-skeleton-base: var(--color-skeleton-base);
+  --color-skeleton-shine: var(--color-skeleton-shine);
+  --color-skeleton-border: var(--color-skeleton-border);
+  --color-skeleton-card-bg: var(--color-skeleton-card-bg);
+  --color-chart-bg: var(--color-chart-bg);
+  --color-chart-grid: var(--color-chart-grid);
+  --color-chart-text: var(--color-chart-text);
+  --color-chart-border: var(--color-chart-border);
+  --color-status-healthy: var(--color-status-healthy);
+  --color-status-warning: var(--color-status-warning);
+  --color-status-critical: var(--color-status-critical);
+  --color-error-border: var(--color-error-border);
+  --color-error-bg: var(--color-error-bg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -260,13 +330,8 @@ body {
 }
 
 .fee-estimator-panel--error {
-  border-color: #fecaca;
-  background: #fff5f5;
-}
-
-.dark .fee-estimator-panel--error {
-  border-color: #7f1d1d;
-  background: #1c0a0a;
+  border-color: var(--color-error-border);
+  background: var(--color-error-bg);
 }
 
 .fee-estimator-header {

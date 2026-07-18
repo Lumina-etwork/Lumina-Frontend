@@ -34,10 +34,10 @@ export function ActivityLogList({ events }: ActivityLogListProps) {
   })
 
   return (
-    <section className="rounded-lg border border-[#d8d0c1] bg-white" aria-labelledby="activity-log-heading">
-      <div className="flex items-center justify-between border-b border-[#d8d0c1] px-4 py-3">
-        <h2 id="activity-log-heading" className="text-sm font-semibold text-[#171512]">Node Activity Log</h2>
-        <span className="text-xs text-[#6f5f48]">{events.length.toLocaleString()} events</span>
+    <section className="rounded-lg border border-border bg-surface" aria-labelledby="activity-log-heading">
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <h2 id="activity-log-heading" className="text-sm font-semibold text-foreground">Node Activity Log</h2>
+        <span className="text-xs text-muted">{events.length.toLocaleString()} events</span>
       </div>
       <div ref={virtualList.containerRef} className="h-[420px] overflow-y-auto" data-testid="activity-log-scrollport">
         <div ref={virtualList.topSentinelRef} aria-hidden="true" />
