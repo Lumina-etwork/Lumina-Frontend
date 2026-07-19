@@ -46,6 +46,31 @@ export interface SyncFlushResult {
   failed: number;
 }
 
+// ── Horizon cursor cache types ──────────────────────────────────────
+
+/**
+ * One page entry in the Horizon cursor cache.
+ * `cursor` is the paging token used to *load* this page (null = first page).
+ */
+export interface HorizonPageRecord {
+  /** 0-based page index */
+  index: number;
+  /** Cursor used to fetch this page (null = page 0, no cursor needed) */
+  cursor: string | null;
+  /** Cursor to fetch the previous page */
+  prevCursor: string | null;
+  /** Cursor to fetch the next page */
+  nextCursor: string | null;
+}
+
+/** Top-level record stored per endpoint/accountId in IndexedDB */
+export interface SerializedCursorCache {
+  /** Key: `horizon/cursors/${accountId}` */
+  endpoint: string;
+  pages: HorizonPageRecord[];
+  updatedAt: string;
+}
+
 interface LuminaFieldDB extends DBSchema {
   inspectionRecords: {
     key: number;
@@ -67,10 +92,15 @@ interface LuminaFieldDB extends DBSchema {
     value: SyncMetadata;
     indexes: { "by-collection": string };
   };
+  /** Horizon cursor cache — keyed by endpoint string */
+  horizonCursors: {
+    key: string;
+    value: SerializedCursorCache;
+  };
 }
 
 const DB_NAME = "lumina-field-db";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBPDatabase<LuminaFieldDB>> | null = null;
 
@@ -110,6 +140,10 @@ export function getFieldDb(): Promise<IDBPDatabase<LuminaFieldDB>> | null {
             autoIncrement: true,
           });
           sm.createIndex("by-collection", "collection");
+        }
+        // v2: Horizon cursor-cache store
+        if (oldVersion < 2) {
+          db.createObjectStore("horizonCursors", { keyPath: "endpoint" });
         }
       },
       blocked() {},
@@ -362,7 +396,6 @@ export async function flushSyncQueue(): Promise<SyncFlushResult> {
   return result;
 }
 
-
 // ── Generic Wrappers for useNodeConfig Hook ──────────────────────────
 
 /**
@@ -388,4 +421,45 @@ export async function loadFromIndexedDB(key: string): Promise<any | null> {
   // Sort by snapshot date to get the newest one if multiple exist
   snapshots.sort((a, b) => new Date(b.snapshotAt).getTime() - new Date(a.snapshotAt).getTime());
   return snapshots[0].config;
+}
+
+// ── Horizon Cursor Cache ─────────────────────────────────────────────
+
+/**
+ * Persists (upserts) the full cursor page list for a given Horizon endpoint.
+ * Key format: `horizon/cursors/${accountId}`
+ */
+export async function saveCursorCache(
+  endpoint: string,
+  pages: HorizonPageRecord[]
+): Promise<void> {
+  const db = await getFieldDb();
+  if (!db) return;
+  await db.put("horizonCursors", {
+    endpoint,
+    pages,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+/**
+ * Loads the cached cursor list for a given Horizon endpoint.
+ * Returns `undefined` when no cache exists.
+ */
+export async function loadCursorCache(
+  endpoint: string
+): Promise<SerializedCursorCache | undefined> {
+  const db = await getFieldDb();
+  if (!db) return undefined;
+  return db.get("horizonCursors", endpoint);
+}
+
+/**
+ * Removes the cursor cache for a given Horizon endpoint.
+ * Called when a cursor expires or is deliberately purged.
+ */
+export async function deleteCursorCache(endpoint: string): Promise<void> {
+  const db = await getFieldDb();
+  if (!db) return;
+  await db.delete("horizonCursors", endpoint);
 }
