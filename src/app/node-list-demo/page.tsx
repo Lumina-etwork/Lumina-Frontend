@@ -138,16 +138,16 @@ export default function NodeListDemoPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#f7f4ee] p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#1a1410]">
+          <h1 className="text-3xl font-bold text-foreground">
             Node List Demo
           </h1>
-          <p className="mt-2 text-[#6f5f48]">
+          <p className="mt-2 text-muted">
             Demonstrates XSS-safe rendering of on-chain node data via{' '}
-            <code className="rounded bg-[#ece5d8] px-1 py-0.5 text-xs">
+            <code className="rounded bg-surface-alt px-1 py-0.5 text-xs">
               sanitizeNodeString
             </code>
             . Node labels use DOMPurify with a restrictive allowlist
@@ -157,7 +157,7 @@ export default function NodeListDemoPage() {
 
         {/* Single NodeCard showcase */}
         <div className="mb-8">
-          <h2 className="mb-4 text-lg font-semibold text-[#1a1410]">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
             Single NodeCard
           </h2>
           <div className="max-w-md">
@@ -170,7 +170,7 @@ export default function NodeListDemoPage() {
 
         {/* NodeList with search and sort */}
         <div className="mb-8">
-          <h2 className="mb-4 text-lg font-semibold text-[#1a1410]">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
             NodeList (Searchable)
           </h2>
           <NodeList
@@ -180,47 +180,47 @@ export default function NodeListDemoPage() {
         </div>
 
         {/* Security info */}
-        <div className="rounded-lg border border-[#d8d0c1] bg-white p-6">
-          <h2 className="mb-4 text-lg font-semibold text-[#1a1410]">
+        <div className="rounded-lg border border-border bg-surface p-6">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
             XSS Protection Details
           </h2>
-          <ul className="space-y-2 text-sm text-[#6f5f48]">
+          <ul className="space-y-2 text-sm text-muted">
             <li className="flex items-start gap-2">
-              <span className="mt-1 text-[#0f766e]">&#10003;</span>
+              <span className="mt-1 text-primary">&#10003;</span>
               <span>
                 <strong>DOMPurify</strong> with isomorphic-dompurify for SSR
                 compatibility
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="mt-1 text-[#0f766e]">&#10003;</span>
+              <span className="mt-1 text-primary">&#10003;</span>
               <span>
-                Only <code className="rounded bg-[#ece5d8] px-1 text-xs">&lt;b&gt;</code>,{' '}
-                <code className="rounded bg-[#ece5d8] px-1 text-xs">&lt;i&gt;</code>,{' '}
-                <code className="rounded bg-[#ece5d8] px-1 text-xs">&lt;a&gt;</code>{' '}
+                Only <code className="rounded bg-surface-alt px-1 text-xs">&lt;b&gt;</code>,{' '}
+                <code className="rounded bg-surface-alt px-1 text-xs">&lt;i&gt;</code>,{' '}
+                <code className="rounded bg-surface-alt px-1 text-xs">&lt;a&gt;</code>{' '}
                 tags survive sanitization
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="mt-1 text-[#0f766e]">&#10003;</span>
+              <span className="mt-1 text-primary">&#10003;</span>
               <span>
-                Anchor tags get <code className="rounded bg-[#ece5d8] px-1 text-xs">rel=&quot;nofollow noopener noreferrer&quot;</code>
+                Anchor tags get <code className="rounded bg-surface-alt px-1 text-xs">rel=&quot;nofollow noopener noreferrer&quot;</code>
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="mt-1 text-[#0f766e]">&#10003;</span>
+              <span className="mt-1 text-primary">&#10003;</span>
               <span>
                 Unicode NFC normalization defeats homoglyph attacks
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="mt-1 text-[#0f766e]">&#10003;</span>
+              <span className="mt-1 text-primary">&#10003;</span>
               <span>
                 Danger-pattern detector logs console warnings for monitoring
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="mt-1 text-[#0f766e]">&#10003;</span>
+              <span className="mt-1 text-primary">&#10003;</span>
               <span>
                 Content-Security-Policy headers block inline script execution
               </span>

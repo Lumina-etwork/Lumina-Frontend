@@ -49,25 +49,25 @@ export default function AnalyticsPage() {
   }, [runAggregation])
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] text-[#171512]">
+    <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-5 sm:px-8 lg:px-10">
-        <header className="flex flex-col gap-4 border-b border-[#d8d0c1] pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <header className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#6f5f48]">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-muted">
               Network Analytics
             </p>
-            <h1 className="mt-2 text-3xl font-semibold text-[#171512] sm:text-4xl">
+            <h1 className="mt-2 text-3xl font-semibold text-foreground sm:text-4xl">
               Year-long connection performance
             </h1>
           </div>
           <div className="flex items-center gap-3">
             {workerAvailable === true && (
-              <span className="rounded-md bg-[#eef7f2] px-2.5 py-1 text-xs font-semibold text-[#0f766e]">
+              <span className="rounded-md bg-tag-bg px-2.5 py-1 text-xs font-semibold text-primary">
                 Worker active
               </span>
             )}
             {workerAvailable === false && (
-              <span className="rounded-md bg-[#fef3e2] px-2.5 py-1 text-xs font-semibold text-[#9a3412]">
+              <span className="rounded-md bg-warning/10 px-2.5 py-1 text-xs font-semibold text-danger">
                 Main thread fallback
               </span>
             )}
@@ -80,8 +80,8 @@ export default function AnalyticsPage() {
               key={g}
               className={`rounded-md border px-4 py-2 text-sm font-semibold transition ${
                 granularity === g
-                  ? 'border-[#0f766e] bg-[#0f766e] text-white'
-                  : 'border-[#cfc4b1] bg-white text-[#3e3830] hover:border-[#0f766e] hover:text-[#0f766e]'
+                  ? 'border-primary bg-primary text-primary-text'
+                  : 'border-border-light bg-surface text-muted-text hover:border-primary hover:text-primary'
               }`}
               onClick={() => setGranularity(g)}
               type="button"
@@ -90,7 +90,7 @@ export default function AnalyticsPage() {
             </button>
           ))}
           <button
-            className="ml-auto rounded-md bg-[#0f766e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#115e59] disabled:opacity-50"
+            className="ml-auto rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-text transition hover:bg-primary-hover disabled:opacity-50"
             disabled={loading}
             onClick={runAggregation}
             type="button"

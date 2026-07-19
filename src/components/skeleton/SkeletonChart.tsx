@@ -34,7 +34,7 @@ export function SkeletonChart({ bars = 12, height = 200, className = '' }: Skele
 
   return (
     <div
-      className={`rounded-lg border border-[#d8d0c1] bg-white p-4 ${className}`}
+      className={`rounded-lg border border-border bg-surface p-4 ${className}`}
       aria-hidden="true"
     >
       <svg

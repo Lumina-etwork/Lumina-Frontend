@@ -90,8 +90,8 @@ const convertToFlatNodes = (nodes: NodePosition[]): FlatNetworkNode[] => {
 
 function NodeSectionSkeleton() {
   return (
-    <div className="rounded-lg border border-[#d8d0c1] bg-white">
-      <div className="flex items-center justify-between border-b border-[#d8d0c1] px-5 py-3">
+    <div className="rounded-lg border border-border bg-surface">
+      <div className="flex items-center justify-between border-b border-border px-5 py-3">
         <div>
           <div
             className="skeleton skeleton-text skeleton-text--lg"
@@ -193,14 +193,14 @@ export function FacilityDashboard() {
   }, [setNodesReady, setAlertsReady, setMetricsReady]);
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] text-[#171512]">
+    <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-[1800px] flex-col px-5 py-5 sm:px-8 lg:px-10">
-        <header className="flex flex-col gap-4 border-b border-[#d8d0c1] pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <header className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#6f5f48]">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-muted">
               Facility Monitor
             </p>
-            <h1 className="mt-2 text-3xl font-semibold text-[#171512] sm:text-4xl">
+            <h1 className="mt-2 text-3xl font-semibold text-foreground sm:text-4xl">
               Network Dashboard
             </h1>
           </div>
@@ -209,8 +209,8 @@ export function FacilityDashboard() {
               type="button"
               className={`rounded px-3 py-1.5 text-sm font-medium transition ${
                 viewMode === "list"
-                  ? "bg-[#0f766e] text-white"
-                  : "bg-[#f7f4ee] text-[#6f5f48] hover:bg-[#ece5d8]"
+                  ? "bg-primary text-primary-text"
+                  : "bg-background text-muted hover:bg-surface-alt"
               }`}
               onClick={() => setViewMode("list")}
             >
@@ -220,8 +220,8 @@ export function FacilityDashboard() {
               type="button"
               className={`rounded px-3 py-1.5 text-sm font-medium transition ${
                 viewMode === "tree"
-                  ? "bg-[#0f766e] text-white"
-                  : "bg-[#f7f4ee] text-[#6f5f48] hover:bg-[#ece5d8]"
+                  ? "bg-primary text-primary-text"
+                  : "bg-background text-muted hover:bg-surface-alt"
               }`}
               onClick={() => setViewMode("tree")}
             >
@@ -255,7 +255,7 @@ export function FacilityDashboard() {
                         height={600}
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center text-[#6f5f48]">
+                      <div className="flex h-full items-center justify-center text-muted">
                         No hierarchical data available
                       </div>
                     )}
@@ -286,7 +286,7 @@ export function FacilityDashboard() {
 
         {solarNodes.length > 0 && (
           <section className="dashboard-grid-cell mb-6">
-            <h2 className="text-lg font-semibold text-[#171512] mb-4">Solar Battery Forecasts</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Solar Battery Forecasts</h2>
             <div className="card-content">
               {solarNodes.slice(0, 3).map((node) => (
                 <div className="dashboard-card" key={node.id}>
@@ -301,24 +301,24 @@ export function FacilityDashboard() {
         )}
 
         <section className="dashboard-grid-cell">
-          <h2 className="text-lg font-semibold text-[#171512] mb-4">Network Metrics</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Network Metrics</h2>
           <div className="card-content">
             {['Latency', 'Throughput', 'Packet Loss', 'Uptime'].map((metric) => (
               <div key={metric} className="dashboard-grid-cell">
                 {metricsSkeleton.showSkeleton ? (
                   <SkeletonCard variant="metric" />
                 ) : (
-                  <div className="skeleton-fade-active rounded-lg border border-[#d8d0c1] bg-white p-4">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-[#6f5f48]">
+                  <div className="skeleton-fade-active rounded-lg border border-border bg-surface p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted">
                       {metric}
                     </p>
-                    <p className="mt-2 text-2xl font-semibold text-[#171512]">
+                    <p className="mt-2 text-2xl font-semibold text-foreground">
                       {metric === 'Latency' && '24ms'}
                       {metric === 'Throughput' && '1,247/s'}
                       {metric === 'Packet Loss' && '0.02%'}
                       {metric === 'Uptime' && '99.97%'}
                     </p>
-                    <p className="mt-1 text-xs text-[#6f5f48]">
+                    <p className="mt-1 text-xs text-muted">
                       {metric === 'Latency' && '12ms avg'}
                       {metric === 'Throughput' && 'Peak: 2,100/s'}
                       {metric === 'Packet Loss' && 'Last 24h'}
@@ -338,8 +338,8 @@ export function FacilityDashboard() {
             {metricsSkeleton.showSkeleton ? (
               <SkeletonChart bars={16} height={220} />
             ) : (
-              <div className="skeleton-fade-active rounded-lg border border-[#d8d0c1] bg-white p-4">
-                <h3 className="text-sm font-semibold text-[#171512] mb-4">
+              <div className="skeleton-fade-active rounded-lg border border-border bg-surface p-4">
+                <h3 className="text-sm font-semibold text-foreground mb-4">
                   Throughput Over Time
                 </h3>
                 <SkeletonChart bars={16} height={220} />

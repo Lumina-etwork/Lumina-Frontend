@@ -104,28 +104,28 @@ export default function ThroughputDemoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f4ee] p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#1a1410]">
+          <h1 className="text-3xl font-bold text-foreground">
             ThroughputChart Performance Demo
           </h1>
-          <p className="mt-2 text-[#6f5f48]">
+          <p className="mt-2 text-muted">
             Testing high-frequency data streaming with throttling and batching
           </p>
         </div>
 
         {/* Controls */}
-        <div className="mb-8 rounded-lg border border-[#d8d0c1] bg-white p-6">
-          <h2 className="mb-4 text-lg font-semibold text-[#1a1410]">
+        <div className="mb-8 rounded-lg border border-border bg-surface p-6">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
             Mock WebSocket Controls
           </h2>
 
           <div className="grid gap-4 md:grid-cols-3">
             {/* Server Control */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#6f5f48]">
+              <label className="mb-2 block text-sm font-medium text-muted">
                 Server Status
               </label>
               <button
@@ -142,7 +142,7 @@ export default function ThroughputDemoPage() {
 
             {/* Message Rate */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#6f5f48]">
+              <label className="mb-2 block text-sm font-medium text-muted">
                 Message Rate: {messageRate} msg/s
               </label>
               <input
@@ -154,7 +154,7 @@ export default function ThroughputDemoPage() {
                 onChange={(e) => handleRateChange(Number(e.target.value))}
                 className="w-full"
               />
-              <div className="mt-1 flex justify-between text-xs text-[#6f5f48]">
+              <div className="mt-1 flex justify-between text-xs text-muted">
                 <span>10</span>
                 <span>500</span>
               </div>
@@ -162,15 +162,15 @@ export default function ThroughputDemoPage() {
 
             {/* Performance Tracking */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#6f5f48]">
+              <label className="mb-2 block text-sm font-medium text-muted">
                 Performance Tracking
               </label>
               <button
                 onClick={() => setEnablePerformance(!enablePerformance)}
                 className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                   enablePerformance
-                    ? 'bg-[#0f766e] text-white'
-                    : 'bg-gray-200 text-gray-700'
+                    ? 'bg-primary text-primary-text'
+                    : 'bg-surface-alt text-muted-text'
                 }`}
               >
                 {enablePerformance ? 'Enabled' : 'Disabled'}
@@ -181,7 +181,7 @@ export default function ThroughputDemoPage() {
           <div className="mt-4">
             <button
               onClick={resetStats}
-              className="rounded-lg bg-gray-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700"
+              className="rounded-lg bg-muted px-4 py-2 text-sm font-medium text-surface transition-colors hover:bg-muted-text"
             >
               Reset Statistics
             </button>
@@ -189,11 +189,11 @@ export default function ThroughputDemoPage() {
         </div>
 
         {/* Technical Bounds Display */}
-        <div className="mb-8 rounded-lg border border-[#d8d0c1] bg-white p-6">
-          <h2 className="mb-4 text-lg font-semibold text-[#1a1410]">
+        <div className="mb-8 rounded-lg border border-border bg-surface p-6">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
             Technical Bounds & Invariants
           </h2>
-          <div className="space-y-2 text-sm text-[#6f5f48]">
+          <div className="space-y-2 text-sm text-muted">
             <p>✓ Chart updates limited to 1 render per 500ms</p>
             <p>✓ Maximum 200 data points in sliding window buffer</p>
             <p>✓ FIFO eviction for oldest data points</p>
@@ -216,20 +216,20 @@ export default function ThroughputDemoPage() {
         </div>
 
         {/* Implementation Notes */}
-        <div className="rounded-lg border border-[#d8d0c1] bg-white p-6">
-          <h2 className="mb-4 text-lg font-semibold text-[#1a1410]">
+        <div className="rounded-lg border border-border bg-surface p-6">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
             Implementation Details
           </h2>
-          <div className="space-y-4 text-sm text-[#6f5f48]">
+          <div className="space-y-4 text-sm text-muted">
             <div>
-              <h3 className="font-semibold text-[#1a1410]">SlidingWindow</h3>
+              <h3 className="font-semibold text-foreground">SlidingWindow</h3>
               <p>
                 Ring buffer with fixed capacity (200). O(1) insertion and
                 retrieval. Automatic FIFO eviction.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-[#1a1410]">useDataThrottle</h3>
+              <h3 className="font-semibold text-foreground">useDataThrottle</h3>
               <p>
                 Accumulates messages between render intervals (500ms). First
                 message triggers immediate render. Uses requestAnimationFrame
@@ -237,14 +237,14 @@ export default function ThroughputDemoPage() {
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-[#1a1410]">useWebSocket</h3>
+              <h3 className="font-semibold text-foreground">useWebSocket</h3>
               <p>
                 Generic WebSocket hook with automatic reconnection, exponential
                 backoff, and message queuing.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-[#1a1410]">
+              <h3 className="font-semibold text-foreground">
                 Performance Monitoring
               </h3>
               <p>

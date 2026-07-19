@@ -22,33 +22,33 @@ export function AnalyticsTimeSeries({ data, loading }: AnalyticsTimeSeriesProps)
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center rounded-lg border border-[#d8d0c1] bg-white p-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0f766e] border-t-transparent" />
-        <span className="ml-3 text-sm text-[#6f5f48]">Computing analytics…</span>
+      <div className="flex items-center justify-center rounded-lg border border-border bg-surface p-12">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <span className="ml-3 text-sm text-muted">Computing analytics…</span>
       </div>
     )
   }
 
   if (!data || data.buckets.length === 0) {
     return (
-      <div className="rounded-lg border border-[#d8d0c1] bg-white p-8 text-center text-sm text-[#6f5f48]">
+      <div className="rounded-lg border border-border bg-surface p-8 text-center text-sm text-muted">
         No analytics data available for the selected period.
       </div>
     )
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-[#d8d0c1] bg-white">
-      <div className="border-b border-[#ece5d8] px-5 py-4">
+    <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+      <div className="border-b border-table-divider px-5 py-4">
         <div className="flex items-baseline justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6f5f48]">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">
               Overall
             </p>
             <p className="mt-1 text-2xl font-semibold">
               {data.overall.avgLatency.toFixed(1)} ms
             </p>
-            <p className="text-xs text-[#6f5f48]">
+            <p className="text-xs text-muted">
               p95: {data.overall.p95Latency.toFixed(1)} ms &middot; p99:{' '}
               {data.overall.p99Latency.toFixed(1)} ms &middot;{' '}
               {data.overall.totalDataPoints.toLocaleString()} data points
@@ -57,7 +57,7 @@ export function AnalyticsTimeSeries({ data, loading }: AnalyticsTimeSeriesProps)
         </div>
       </div>
       <table className="w-full border-collapse text-left text-sm">
-        <thead className="bg-[#faf8f3] text-xs uppercase tracking-[0.12em] text-[#6f5f48]">
+        <thead className="bg-surface-alt text-xs uppercase tracking-[0.12em] text-muted">
           <tr>
             <th className="px-5 py-3 font-semibold">Time</th>
             <th className="px-5 py-3 font-semibold">Avg Latency</th>
@@ -68,7 +68,7 @@ export function AnalyticsTimeSeries({ data, loading }: AnalyticsTimeSeriesProps)
         </thead>
         <tbody>
           {series.map((row) => (
-            <tr className="border-t border-[#ece5d8]" key={row.time}>
+            <tr className="border-t border-table-divider" key={row.time}>
               <td className="px-5 py-3 font-medium">{row.time}</td>
               <td className="px-5 py-3">{row.avgLatency} ms</td>
               <td className="px-5 py-3">{row.p95} ms</td>

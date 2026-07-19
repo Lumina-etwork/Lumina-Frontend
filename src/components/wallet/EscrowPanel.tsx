@@ -143,23 +143,23 @@ export function EscrowPanel() {
   };
 
   return (
-    <section className="rounded-lg border border-[#d8d0c1] bg-white">
+    <section className="rounded-lg border border-border bg-surface">
       {/* Header */}
-      <div className="border-b border-[#d8d0c1] px-5 py-4">
-        <h2 className="text-lg font-semibold text-[#171512]">Escrow Management</h2>
-        <p className="mt-0.5 text-sm text-[#6f5f48]">
+      <div className="border-b border-border px-5 py-4">
+        <h2 className="text-lg font-semibold text-foreground">Escrow Management</h2>
+        <p className="mt-0.5 text-sm text-muted">
           Deposit or withdraw funds from your escrow account
         </p>
       </div>
 
       {/* Balance Display */}
-      <div className="border-b border-[#d8d0c1] bg-[#faf8f5] px-5 py-4">
+      <div className="border-b border-border bg-surface-alt px-5 py-4">
         <div className="flex items-baseline gap-2">
-          <span className="text-sm font-medium text-[#6f5f48]">Current Balance:</span>
+          <span className="text-sm font-medium text-muted">Current Balance:</span>
           {billingLoading ? (
-            <div className="h-6 w-24 animate-pulse rounded bg-[#ece5d8]" />
+            <div className="h-6 w-24 animate-pulse rounded bg-surface-alt" />
           ) : (
-            <span className="text-2xl font-bold text-[#0f766e]">
+            <span className="text-2xl font-bold text-primary">
               {billingData?.formattedBalance ?? "0.0"} XLM
             </span>
           )}
@@ -172,8 +172,8 @@ export function EscrowPanel() {
       </div>
 
       {/* Deposit Section */}
-      <div className="border-b border-[#ece5d8] px-5 py-5">
-        <h3 className="mb-3 text-sm font-semibold text-[#171512]">Deposit Funds</h3>
+      <div className="border-b border-table-divider px-5 py-5">
+        <h3 className="mb-3 text-sm font-semibold text-foreground">Deposit Funds</h3>
         <div className="flex gap-3">
           <input
             type="number"
@@ -182,7 +182,7 @@ export function EscrowPanel() {
             placeholder="Amount (XLM)"
             min="0"
             step="0.1"
-            className="flex-1 rounded-md border border-[#cfc4b1] px-3 py-2 text-sm text-[#171512] placeholder-[#9b8a6f] focus:border-[#0f766e] focus:outline-none focus:ring-1 focus:ring-[#0f766e]"
+            className="flex-1 rounded-md border border-border-light px-3 py-2 text-sm text-foreground placeholder-placeholder focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             disabled={isSubmitting}
           />
           <button
@@ -190,19 +190,19 @@ export function EscrowPanel() {
             type="button"
             onClick={handleDeposit}
             disabled={isSubmitting || !depositAmount}
-            className="rounded-md bg-[#0f766e] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#0d6560] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-text transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? "Processing..." : "Deposit"}
           </button>
         </div>
-        <p className="mt-2 text-xs text-[#6f5f48]">
+        <p className="mt-2 text-xs text-muted">
           Funds will be locked in the escrow contract on Stellar Soroban
         </p>
       </div>
 
       {/* Withdraw Section */}
       <div className="px-5 py-5">
-        <h3 className="mb-3 text-sm font-semibold text-[#171512]">Withdraw Funds</h3>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">Withdraw Funds</h3>
         <div className="flex gap-3">
           <input
             type="number"
@@ -211,7 +211,7 @@ export function EscrowPanel() {
             placeholder="Amount (XLM)"
             min="0"
             step="0.1"
-            className="flex-1 rounded-md border border-[#cfc4b1] px-3 py-2 text-sm text-[#171512] placeholder-[#9b8a6f] focus:border-[#0f766e] focus:outline-none focus:ring-1 focus:ring-[#0f766e]"
+            className="flex-1 rounded-md border border-border-light px-3 py-2 text-sm text-foreground placeholder-placeholder focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             disabled={isSubmitting}
           />
           <button
@@ -219,12 +219,12 @@ export function EscrowPanel() {
             type="button"
             onClick={handleWithdraw}
             disabled={isSubmitting || !withdrawAmount}
-            className="rounded-md border border-[#cfc4b1] px-4 py-2 text-sm font-medium text-[#3e3830] transition hover:border-[#0f766e] hover:text-[#0f766e] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md border border-border-light px-4 py-2 text-sm font-medium text-muted-text transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? "Processing..." : "Withdraw"}
           </button>
         </div>
-        <p className="mt-2 text-xs text-[#6f5f48]">
+        <p className="mt-2 text-xs text-muted">
           Withdraw available funds from your escrow balance
         </p>
       </div>
