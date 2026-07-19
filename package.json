@@ -22,8 +22,8 @@
     "test:workspace": "tsx src/store/__tests__/workspaceStore.test.ts",
     "test:network-cache": "tsx src/lib/offline/tests/networkCache.test.ts",
     "test:waterfall": "tsx src/lib/__tests__/invalidationRegistry.test.ts",
-    "test:config-audit": "tsx src/lib/config/__tests__/configAudit.test.ts",
-    "test:all": "tsx src/lib/__tests__/offlineQueue.test.ts && tsx src/lib/__tests__/OptimisticTransactionManager.test.ts && tsx src/services/__tests__/localCache.test.ts && tsx src/lib/__tests__/txQueue.test.ts && tsx src/lib/__tests__/slidingWindow.test.ts && tsx src/lib/__tests__/idbClient.test.ts && tsx src/services/__tests__/sharedStateSync.test.ts && tsx src/store/__tests__/workspaceStore.test.ts && tsx src/lib/offline/tests/networkCache.test.ts && tsx src/lib/__tests__/invalidationRegistry.test.ts && tsx src/lib/config/__tests__/configAudit.test.ts"
+    "test:horizon-pagination": "tsx src/lib/horizon/__tests__/useHorizonPagination.test.ts",
+    "test:all": "tsx src/lib/__tests__/offlineQueue.test.ts && tsx src/lib/__tests__/OptimisticTransactionManager.test.ts && tsx src/services/__tests__/localCache.test.ts && tsx src/lib/__tests__/txQueue.test.ts && tsx src/lib/__tests__/slidingWindow.test.ts && tsx src/lib/__tests__/idbClient.test.ts && tsx src/services/__tests__/sharedStateSync.test.ts && tsx src/store/__tests__/workspaceStore.test.ts && tsx src/lib/offline/tests/networkCache.test.ts && tsx src/lib/__tests__/invalidationRegistry.test.ts && tsx src/lib/horizon/__tests__/useHorizonPagination.test.ts"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
