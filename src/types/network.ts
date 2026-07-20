@@ -137,3 +137,59 @@ export interface AnalyticsWorkerResponse {
 }
 
 export type AnalyticsWorkerMessage = AnalyticsWorkerRequest | AnalyticsWorkerResponse
+
+export interface GeoPosition {
+  lat: number
+  lng: number
+}
+
+export interface NetworkActivityMessage {
+  timestamp: number
+  sourceLat: number
+  sourceLng: number
+  targetLat: number
+  targetLng: number
+  messageCount: number
+  nodeId: string
+}
+
+export interface HeatmapCell {
+  lat: number
+  lng: number
+  count: number
+  weight: number
+}
+
+export interface TrafficArc {
+  id: string
+  sourceLat: number
+  sourceLng: number
+  targetLat: number
+  targetLng: number
+  messageCount: number
+  color: string
+}
+
+export type TimeRange = 'realtime' | '1h' | '6h' | '24h'
+
+export interface NetworkActivityData {
+  cells: HeatmapCell[]
+  arcs: TrafficArc[]
+  messageCount: number
+  activeNodes: number
+  timestamp: number
+}
+
+export const TIME_RANGE_LABELS: Record<TimeRange, string> = {
+  realtime: 'Real-Time',
+  '1h': 'Last Hour',
+  '6h': 'Last 6 Hours',
+  '24h': 'Last 24 Hours',
+}
+
+export const TIME_RANGE_WINDOWS: Record<TimeRange, number> = {
+  realtime: 5 * 60 * 1000,
+  '1h': 60 * 60 * 1000,
+  '6h': 6 * 60 * 60 * 1000,
+  '24h': 24 * 60 * 60 * 1000,
+}
