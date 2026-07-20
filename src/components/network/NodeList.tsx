@@ -77,7 +77,7 @@ export function NodeList({
     return (
       <div
         data-testid="node-list-empty"
-        className={`rounded-lg border border-[#d8d0c1] bg-white px-5 py-8 text-center text-sm text-[#6f5f48] ${className}`}
+        className={`rounded-lg border border-border bg-surface px-5 py-8 text-center text-sm text-muted ${className}`}
       >
         No nodes available.
       </div>
@@ -87,13 +87,13 @@ export function NodeList({
   return (
     <div
       data-testid="node-list"
-      className={`rounded-lg border border-[#d8d0c1] bg-white ${className}`}
+      className={`rounded-lg border border-border bg-surface ${className}`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 border-b border-[#d8d0c1] px-5 py-3">
+      <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
         <div>
-          <h2 className="text-sm font-semibold text-[#171512]">Nodes</h2>
-          <p className="mt-0.5 text-xs text-[#6f5f48]">
+          <h2 className="text-sm font-semibold text-foreground">Nodes</h2>
+          <p className="mt-0.5 text-xs text-muted">
             {displayed.length} of {nodes.length} node{nodes.length !== 1 ? 's' : ''}
             {searchQuery ? ' (filtered)' : ''}
           </p>
@@ -101,15 +101,13 @@ export function NodeList({
 
         {/* Sort toggle */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase tracking-[0.08em] text-[#9b8a6f]">
-            Sort
-          </span>
+          <span className="text-[10px] uppercase tracking-[0.08em] text-muted">Sort</span>
           <button
             type="button"
             className={`rounded px-2 py-0.5 text-[11px] font-medium transition ${
               sortBy === 'label'
-                ? 'bg-[#0f766e] text-white'
-                : 'bg-[#f7f4ee] text-[#6f5f48] hover:bg-[#ece5d8]'
+                ? 'bg-primary text-primary-text'
+                : 'bg-background text-muted hover:bg-surface-alt'
             }`}
             onClick={() => setSortBy('label')}
           >
@@ -119,8 +117,8 @@ export function NodeList({
             type="button"
             className={`rounded px-2 py-0.5 text-[11px] font-medium transition ${
               sortBy === 'id'
-                ? 'bg-[#0f766e] text-white'
-                : 'bg-[#f7f4ee] text-[#6f5f48] hover:bg-[#ece5d8]'
+                ? 'bg-primary text-primary-text'
+                : 'bg-background text-muted hover:bg-surface-alt'
             }`}
             onClick={() => setSortBy('id')}
           >
@@ -130,11 +128,11 @@ export function NodeList({
       </div>
 
       {/* Search bar (always shown when nodes exist) */}
-      <div className="border-b border-[#ece5d8] px-5 py-2">
+      <div className="border-b border-table-divider px-5 py-2">
         <input
           type="text"
           data-testid="node-list-search"
-          className="w-full rounded-md border border-[#cfc4b1] bg-[#fafaf7] px-3 py-1.5 text-xs text-[#171512] placeholder-[#9b8a6f] transition focus:border-[#0f766e] focus:outline-none focus:ring-1 focus:ring-[#0f766e]"
+          className="w-full rounded-md border border-border-light bg-surface-alt px-3 py-1.5 text-xs text-foreground placeholder-placeholder transition focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           placeholder="Filter nodes by name or ID…"
           value={searchQuery}
           onChange={handleSearchChange}
@@ -145,7 +143,7 @@ export function NodeList({
       {/* Node list */}
       <div
         data-testid="node-list-container"
-        className="max-h-96 divide-y divide-[#f7f4ee] overflow-y-auto"
+        className="max-h-96 divide-y divide-background overflow-y-auto"
       >
         {displayed.map((node) => (
           <div key={node.id} className="px-3 py-2">
@@ -161,7 +159,7 @@ export function NodeList({
 
       {/* Truncation notice */}
       {isTruncated && (
-        <div className="border-t border-[#ece5d8] px-5 py-2 text-center text-[10px] text-[#9b8a6f]">
+        <div className="border-t border-table-divider px-5 py-2 text-center text-[10px] text-muted">
           Showing {maxDisplay} of {filtered.length} matching nodes.
           Use search to find specific nodes.
         </div>

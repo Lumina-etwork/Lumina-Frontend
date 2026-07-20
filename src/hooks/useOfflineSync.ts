@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { flushSyncQueue, getSyncQueueSize } from "@/src/lib/idbClient";
+import { flushSyncQueue, getSyncQueueSize } from "@/src/lib/storage/idb";
 
 export type SyncStatus = "idle" | "syncing" | "error";
 

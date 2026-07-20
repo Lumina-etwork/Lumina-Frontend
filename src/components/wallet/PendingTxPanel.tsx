@@ -89,13 +89,13 @@ export function PendingTxPanel({
   );
 
   return (
-    <section className="rounded-lg border border-[#d8d0c1] bg-white">
-      <div className="flex items-center justify-between border-b border-[#d8d0c1] px-5 py-4">
+    <section className="rounded-lg border border-border bg-surface">
+      <div className="flex items-center justify-between border-b border-border px-5 py-4">
         <div>
-          <h2 className="text-lg font-semibold text-[#171512]">
+          <h2 className="text-lg font-semibold text-foreground">
             Pending Transactions
           </h2>
-          <p className="mt-0.5 text-sm text-[#6f5f48]">
+          <p className="mt-0.5 text-sm text-muted">
             {transactions.length === 0
               ? "No transactions in queue"
               : `${transactions.filter((t) => t.status === "pending").length} pending, ${transactions.length} total`}
@@ -103,12 +103,12 @@ export function PendingTxPanel({
         </div>
         <div className="flex items-center gap-2">
           {syncing && (
-            <span className="text-xs text-[#6f5f48]">Syncing...</span>
+            <span className="text-xs text-muted">Syncing...</span>
           )}
           <button
             type="button"
             onClick={onRefresh}
-            className="rounded-md border border-[#cfc4b1] px-3 py-1.5 text-sm font-medium text-[#3e3830] transition hover:border-[#0f766e] hover:text-[#0f766e]"
+            className="rounded-md border border-border-light px-3 py-1.5 text-sm font-medium text-muted-text transition hover:border-primary hover:text-primary"
           >
             Refresh
           </button>
@@ -116,11 +116,11 @@ export function PendingTxPanel({
       </div>
 
       {transactions.length === 0 ? (
-        <div className="px-5 py-12 text-center text-sm text-[#6f5f48]">
+        <div className="px-5 py-12 text-center text-sm text-muted">
           No broadcast transactions recorded yet.
         </div>
       ) : (
-        <div className="divide-y divide-[#ece5d8]">
+        <div className="divide-y divide-table-divider">
           {transactions.map((tx) => (
             <div
               key={tx.idempotencyKey}
@@ -129,11 +129,11 @@ export function PendingTxPanel({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <StatusBadge status={tx.status} />
-                  <span className="truncate text-sm font-medium text-[#171512]">
+                  <span className="truncate text-sm font-medium text-foreground">
                     {tx.contractId}.{tx.method}
                   </span>
                 </div>
-                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[#6f5f48]">
+                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted">
                   <span>
                     Created:{" "}
                     {new Date(tx.createdAt).toLocaleString(undefined, {
@@ -156,7 +156,7 @@ export function PendingTxPanel({
                   <button
                     type="button"
                     onClick={() => onRetry(tx.idempotencyKey)}
-                    className="rounded-md bg-[#0f766e] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#115e59]"
+                    className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-text transition hover:bg-primary-hover"
                   >
                     Retry
                   </button>
@@ -164,7 +164,7 @@ export function PendingTxPanel({
                 <button
                   type="button"
                   onClick={() => onCancel(tx.idempotencyKey)}
-                  className="rounded-md border border-[#cfc4b1] px-3 py-1.5 text-xs font-medium text-[#6f5f48] transition hover:border-rose-300 hover:text-rose-600"
+                  className="rounded-md border border-border-light px-3 py-1.5 text-xs font-medium text-muted transition hover:border-rose-300 hover:text-rose-600"
                 >
                   Remove
                 </button>
@@ -175,11 +175,11 @@ export function PendingTxPanel({
       )}
 
       {hasCompleted && (
-        <div className="border-t border-[#ece5d8] px-5 py-3">
+        <div className="border-t border-table-divider px-5 py-3">
           <button
             type="button"
             onClick={onClearCompleted}
-            className="text-xs font-medium text-[#6f5f48] underline underline-offset-2 transition hover:text-[#0f766e]"
+            className="text-xs font-medium text-muted underline underline-offset-2 transition hover:text-primary"
           >
             Clear completed &gt; 24h old
           </button>
