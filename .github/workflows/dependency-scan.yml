@@ -42,22 +42,25 @@ jobs:
       - name: pnpm audit (direct dependencies)
         id: pnpm-audit
         continue-on-error: true
+        shell: bash
         run: |
+          set -o pipefail
           pnpm audit --audit-level=high 2>&1 | tee pnpm-audit-output.txt
-          # Capture exit code without failing the step
-          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
       - name: npm audit (fallback scanner)
         id: npm-audit
         continue-on-error: true
+        shell: bash
         run: |
+          set -o pipefail
           npm audit --audit-level=high 2>&1 | tee npm-audit-output.txt
-          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
       - name: OSV-Scanner (transitive dependencies)
         id: osv-scan
         continue-on-error: true
-        uses: google/osv-scanner-action@v1.0.1
+        uses: google/osv-scanner-action/osv-scanner-action@v2.3.8
         with:
           scan-args: |-
             --lockfile=pnpm-lock.yaml
