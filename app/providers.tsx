@@ -8,6 +8,7 @@ import { WalletProvider } from "@/src/components/providers/WalletProvider";
 import { SessionProvider } from "@/src/components/providers/SessionProvider";
 import { WalletStatusBar } from "@/src/components/shared/WalletStatusBar";
 import { ThemeProvider } from "@/src/components/providers/ThemeProvider";
+import { I18nProvider } from "@/src/i18n/I18nProvider";
 import { useOfflineSync, OfflineSyncContext } from "@/src/hooks/useOfflineSync";
 import { useSharedStateQuerySync } from "@/src/hooks/useSharedStateQuerySync";
 import { useNetworkStatus } from "@/src/hooks/useNetworkStatus";
@@ -61,16 +62,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <SharedStateQueryBridge />
       <SentryOfflineQueueBridge />
       <ThemeProvider>
-        <WalletProvider>
-          <SessionProvider>
-            <OfflineSyncProvider>
-              <AppErrorBoundary>
-                {children}
-                <WalletStatusBar />
-              </AppErrorBoundary>
-            </OfflineSyncProvider>
-          </SessionProvider>
-        </WalletProvider>
+        <I18nProvider>
+          <WalletProvider>
+            <SessionProvider>
+              <OfflineSyncProvider>
+                <AppErrorBoundary>
+                  {children}
+                  <WalletStatusBar />
+                </AppErrorBoundary>
+              </OfflineSyncProvider>
+            </SessionProvider>
+          </WalletProvider>
+        </I18nProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

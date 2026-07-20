@@ -54,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const blockingScript = `
-    (function(){try{var t=localStorage.getItem("lumina-theme");if(t==="solar"||t==="dark"){document.documentElement.classList.add(t)}}catch(e){}})();
+    (function(){try{var t=localStorage.getItem("lumina-theme");if(t==="solar"||t==="dark"){document.documentElement.classList.add(t)}var l=localStorage.getItem("lumina-locale");if(l==="ar-SA"||l==="he-IL"){document.documentElement.dir="rtl"}}catch(e){}})();
   `;
 
   return (

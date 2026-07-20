@@ -1,4 +1,5 @@
 import { ThemeSelector } from "@/src/components/settings/ThemeSelector";
+import { LocaleSwitcher } from "@/src/i18n/LocaleSwitcher";
 
 const vaults = [
   { beneficiary: "Orbit Labs", asset: "LUM", unlocked: "68%", nextClaim: "18,500", status: "On schedule" },
@@ -33,6 +34,9 @@ export default function Home() {
               ))}
               <a className="rounded-md border border-border-light bg-surface px-3 py-2 transition hover:border-primary hover:text-primary" href="/pending-tx">Pending</a>
             </nav>
+            <div className="hidden sm:block">
+              <LocaleSwitcher />
+            </div>
             <ThemeSelector />
           </div>
         </header>
