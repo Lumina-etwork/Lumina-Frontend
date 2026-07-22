@@ -1,0 +1,107 @@
+name: Dependency Vulnerability Scan
+
+on:
+  push:
+    branches: [main, "release/*"]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * *"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DEPLOY_CHANNEL: ${{ github.ref_name == 'main' && 'stable' || 'canary' }}
+
+jobs:
+  scan:
+    name: Scan and gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: pnpm audit (direct dependencies)
+        id: pnpm-audit
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm audit --audit-level=high 2>&1 | tee pnpm-audit-output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: npm audit (fallback scanner)
+        id: npm-audit
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm audit --audit-level=high 2>&1 | tee npm-audit-output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: OSV-Scanner (transitive dependencies)
+        id: osv-scan
+        continue-on-error: true
+        uses: google/osv-scanner-action/osv-scanner-action@v2.3.8
+        with:
+          scan-args: |-
+            --lockfile=pnpm-lock.yaml
+            --format=json
+            --output=osv-results.json
+
+      - name: Generate SBOM
+        id: sbom
+        continue-on-error: true
+        run: |
+          npx @cyclonedx/cyclonedx-npm --output-file sbom.json
+
+      - name: Aggregate results and gate
+        id: gate
+        run: node scripts/check-deployment-gate.mjs
+        env:
+          DEPLOY_CHANNEL: ${{ env.DEPLOY_CHANNEL }}
+          PNPM_AUDIT_EXIT_CODE: ${{ steps.pnpm-audit.outputs.exit_code || '0' }}
+          NPM_AUDIT_EXIT_CODE: ${{ steps.npm-audit.outputs.exit_code || '0' }}
+          OSV_RESULTS_FILE: osv-results.json
+
+      - name: Upload scan artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-report
+          path: |
+            pnpm-audit-output.txt
+            npm-audit-output.txt
+            osv-results.json
+            sbom.json
+            gate-result.json
+          retention-days: 30
+
+      - name: Post scan summary
+        if: always()
+        run: |
+          echo "## Dependency Vulnerability Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f gate-result.json ]; then
+            echo '```json' >> $GITHUB_STEP_SUMMARY
+            cat gate-result.json >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
