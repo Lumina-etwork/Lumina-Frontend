@@ -24,11 +24,13 @@
     "test:waterfall": "tsx src/lib/__tests__/invalidationRegistry.test.ts",
     "test:redis-cache": "tsx src/lib/cache/__tests__/redisCache.test.ts",
     "test:horizon-pagination": "tsx src/lib/horizon/__tests__/useHorizonPagination.test.ts",
-    "test:redis-cache": "tsx src/lib/cache/__tests__/redisCache.test.ts",
-    "test:all": "tsx src/lib/__tests__/offlineQueue.test.ts && tsx src/lib/__tests__/OptimisticTransactionManager.test.ts && tsx src/services/__tests__/localCache.test.ts && tsx src/lib/__tests__/txQueue.test.ts && tsx src/lib/__tests__/slidingWindow.test.ts && tsx src/lib/__tests__/idbClient.test.ts && tsx src/services/__tests__/sharedStateSync.test.ts && tsx src/store/__tests__/workspaceStore.test.ts && tsx src/lib/offline/tests/networkCache.test.ts && tsx src/lib/__tests__/invalidationRegistry.test.ts && tsx src/lib/horizon/__tests__/useHorizonPagination.test.ts && tsx src/lib/cache/__tests__/redisCache.test.ts"
     "test:backup": "tsx src/lib/backup/__tests__/backupRestore.test.ts",
     "test:backup-scheduler": "tsx src/lib/backup/__tests__/scheduler.test.ts",
-    "test:all": "tsx src/lib/__tests__/offlineQueue.test.ts && tsx src/lib/__tests__/OptimisticTransactionManager.test.ts && tsx src/services/__tests__/localCache.test.ts && tsx src/lib/__tests__/txQueue.test.ts && tsx src/lib/__tests__/slidingWindow.test.ts && tsx src/lib/__tests__/idbClient.test.ts && tsx src/services/__tests__/sharedStateSync.test.ts && tsx src/store/__tests__/workspaceStore.test.ts && tsx src/lib/offline/tests/networkCache.test.ts && tsx src/lib/__tests__/invalidationRegistry.test.ts && tsx src/lib/horizon/__tests__/useHorizonPagination.test.ts && tsx src/lib/backup/__tests__/backupRestore.test.ts && tsx src/lib/backup/__tests__/scheduler.test.ts"
+    "test:scheduler": "tsx src/lib/scheduler/__tests__/scheduler.test.ts",
+    "test:approval-manager": "tsx src/lib/approvalManager/__tests__/approvalManager.test.ts",
+    "test:bridge": "tsx src/lib/bridge/__tests__/bridgeStore.test.ts",
+    "test:staking": "tsx src/lib/staking/__tests__/stakingCalculator.test.ts",
+    "test:all": "tsx src/lib/__tests__/offlineQueue.test.ts && tsx src/lib/__tests__/OptimisticTransactionManager.test.ts && tsx src/services/__tests__/localCache.test.ts && tsx src/lib/__tests__/txQueue.test.ts && tsx src/lib/__tests__/slidingWindow.test.ts && tsx src/lib/__tests__/idbClient.test.ts && tsx src/services/__tests__/sharedStateSync.test.ts && tsx src/store/__tests__/workspaceStore.test.ts && tsx src/lib/offline/tests/networkCache.test.ts && tsx src/lib/__tests__/invalidationRegistry.test.ts && tsx src/lib/horizon/__tests__/useHorizonPagination.test.ts && tsx src/lib/cache/__tests__/redisCache.test.ts && tsx src/lib/backup/__tests__/backupRestore.test.ts && tsx src/lib/backup/__tests__/scheduler.test.ts && tsx src/lib/scheduler/__tests__/scheduler.test.ts && tsx src/lib/approvalManager/__tests__/approvalManager.test.ts && tsx src/lib/bridge/__tests__/bridgeStore.test.ts && tsx src/lib/staking/__tests__/stakingCalculator.test.ts"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
