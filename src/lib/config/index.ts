@@ -9,10 +9,7 @@ export type {
   DriftSeverity,
   RuntimeConfigSnapshot,
 } from "./types";
-export {
-  PERFORMANCE_BUDGET_MS,
-  SENSITIVE_PATH_FRAGMENTS,
-} from "./types";
+export { PERFORMANCE_BUDGET_MS, SENSITIVE_PATH_FRAGMENTS } from "./types";
 export {
   ALL_BASELINES,
   ALLOWED_DEPLOY_CHANNELS,
@@ -32,3 +29,18 @@ export {
   CANARY_MAX_DRIFT_RATE,
   CANARY_MIN_SAMPLES,
 } from "./canary";
+export {
+  DEFAULT_CONFIG_SCHEMAS,
+  validateConfigSchema,
+  type ConfigSchema,
+  type ConfigSchemaRule,
+  type SchemaValueType,
+} from "./schema";
+export {
+  applyHotReloadUpdate,
+  getHotReloadState,
+  resetHotReloadStateForTests,
+  type HotReloadApplyResult,
+  type HotReloadConfigUpdate,
+  type HotReloadState,
+} from "./hotReload";
