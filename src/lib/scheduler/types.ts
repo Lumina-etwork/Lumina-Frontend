@@ -1,4 +1,5 @@
-export type JobStatus = "pending" | "running" | "completed" | "failed" | "timed_out"
+export type JobStatus = "pending" | "running" | "completed" | "failed" | "timed_out" | "dead_lettered"
+export type DeadLetterReason = "max_retries_exceeded" | "lease_expired" | "manual"
 export type LeaseStatus = "active" | "expired" | "released"
 
 export interface WorkerIdentity {
@@ -30,6 +31,15 @@ export interface Job<T = unknown> {
   leaseExpiresAt?: number
 }
 
+export interface DeadLetterEntry<T = unknown> {
+  entryId: string
+  job: Job<T>
+  reason: DeadLetterReason
+  error?: string
+  failedAt: number
+  retryCount: number
+}
+
 export interface Lease {
   leaseId: string
   jobId: string
@@ -51,6 +61,7 @@ export interface SchedulerMetrics {
   totalJobsSubmitted: number
   totalJobsCompleted: number
   totalJobsFailed: number
+  deadLetteredJobs: number
   activeLeases: number
   expiredLeases: number
   averageQueueTimeMs: number
@@ -66,6 +77,8 @@ export type SchedulerEventType =
   | "job_completed"
   | "job_failed"
   | "job_timed_out"
+  | "job_dead_lettered"
+  | "job_requeued_from_dead_letter"
   | "lease_acquired"
   | "lease_expired"
   | "lease_released"
@@ -92,5 +105,6 @@ export interface SchedulerConfig {
   queuePollIntervalMs: number
   maxConcurrentJobs: number
   historyRetentionCount: number
+  deadLetterRetentionCount: number
   performanceBudgetMs: number
 }

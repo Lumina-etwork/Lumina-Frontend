@@ -81,8 +81,9 @@ async function runCoreTests() {
     s.claimJob({ workerId: "w1", jobId: job.jobId, leaseDurationMs: 30_000, claimedAt: Date.now() })
     s.failJob(job.jobId, "fatal")
     const failed = s.getJob(job.jobId)
-    assert.equal(failed?.status, "failed")
+    assert.equal(failed?.status, "dead_lettered")
     assert.equal(failed?.error, "fatal")
+    assert.equal(s.getDeadLetterQueue().length, 1)
   })
 
   await test("deduplicate same job type pending submission", async () => {
@@ -108,13 +109,32 @@ async function runCoreTests() {
     assert.equal(all[0].jobId, j1.jobId)
     assert.equal(all[1].jobId, j2.jobId)
   })
+
+  await test("dead-lettered jobs can be inspected and requeued", async () => {
+    const s = new DistributedScheduler()
+    const job = s.submit(makeDef({ maxRetries: 0, jobType: "dlq-requeue" }))
+    s.claimJob({ workerId: "w1", jobId: job.jobId, leaseDurationMs: 30_000, claimedAt: Date.now() })
+    s.failJob(job.jobId, "poison message")
+
+    const [entry] = s.getDeadLetterQueue()
+    assert.ok(entry.entryId)
+    assert.equal(entry.reason, "max_retries_exceeded")
+    assert.equal(entry.job.jobId, job.jobId)
+    assert.equal(s.getMetrics().deadLetteredJobs, 1)
+
+    const requeued = s.requeueDeadLetter(entry.entryId)
+    assert.equal(requeued?.status, "pending")
+    assert.equal(s.getDeadLetterQueue().length, 0)
+    assert.ok(s.getEventHistory().some((event) => event.type === "job_requeued_from_dead_letter"))
+  })
+
 }
 
 async function runLeaseTests() {
   console.log("\n  lease management tests")
 
   await test("lease expires and job returns to pending", async () => {
-    const config = { ...DEFAULT_CONFIG, leaseDurationMs: 10 }
+    const config = { ...DEFAULT_CONFIG, leaseDurationMs: 10, queuePollIntervalMs: 5 }
     const s = new DistributedScheduler(config)
     const job = s.submit(makeDef({ maxRetries: 1 }))
     s.claimJob({ workerId: "w1", jobId: job.jobId, leaseDurationMs: 10, claimedAt: Date.now() })
@@ -126,7 +146,7 @@ async function runLeaseTests() {
   })
 
   await test("lease expired beyond max retries becomes timed_out", async () => {
-    const config = { ...DEFAULT_CONFIG, leaseDurationMs: 10 }
+    const config = { ...DEFAULT_CONFIG, leaseDurationMs: 10, queuePollIntervalMs: 5 }
     const s = new DistributedScheduler(config)
     const job = s.submit(makeDef({ maxRetries: 0 }))
     s.claimJob({ workerId: "w1", jobId: job.jobId, leaseDurationMs: 10, claimedAt: Date.now() })
@@ -134,7 +154,8 @@ async function runLeaseTests() {
     await new Promise((r) => setTimeout(r, 50))
     s.stop()
     const expired = s.getJob(job.jobId)
-    assert.equal(expired?.status, "timed_out")
+    assert.equal(expired?.status, "dead_lettered")
+    assert.equal(s.getDeadLetterQueue()[0]?.reason, "lease_expired")
   })
 
   await test("register and unregister workers", async () => {
