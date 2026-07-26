@@ -12,7 +12,7 @@ Next.js web application for Lumina Network, providing a dashboard for managing v
  
 * **Language/Framework:** Next.js (React) / TypeScript
 * **Styling:** Tailwind CSS
-* **Package Manager:** npm
+* **Package Manager:** pnpm (via Corepack)
  
 ## Sensitive Payload Encryption
  
@@ -40,26 +40,44 @@ See `CONFIG_AUDIT_ARCHITECTURE.md` and `CONFIG_AUDIT_RUNBOOK.md`.
 ### Prerequisites
 
 * Node.js 22 or higher
-* npm
+* pnpm (Corepack recommended)
 
 ### Installation
 
 ```bash
 git clone https://github.com/ZuLu0890/Lumina-Frontend.git
 cd Lumina-Frontend
-npm install
+corepack enable
+pnpm run onboard
 ```
+
+
+### One-command onboarding
+
+Run the onboarding helper to validate your Node.js version, create local environment files, install dependencies with the detected package manager, and run TypeScript checks:
+
+```bash
+pnpm run onboard
+```
+
+For CI or pre-flight validation without installing dependencies, run:
+
+```bash
+pnpm run onboard:check
+```
+
+The script creates `.env.local` from `.env.example` when needed and verifies the required `NEXT_PUBLIC_*` configuration keys for local development.
 
 ### Local Development
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ### Production Build
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 ## Contributing
