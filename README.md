@@ -65,3 +65,7 @@ npm run build
 ## Contributing
 
 Contributions are welcome. Please keep changes focused, verify the production build before opening a pull request, and open an issue first for major structural changes.
+
+## Configuration Management
+
+Runtime configuration is audited through schema validation, baseline drift detection, hot-reload safety checks, and canary promotion gates. See the [configuration architecture](docs/architecture/config-management.md) and [configuration runbook](docs/runbooks/config-management.md) for rollout and incident-response details.
