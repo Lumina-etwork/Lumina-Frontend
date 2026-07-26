@@ -176,6 +176,32 @@ run("ConfigAuditor detects soroban drift and emits to subscribers", () => {
   assert.equal(seen!.service, "soroban-rpc");
 });
 
+run("ConfigAuditor validates mesh mutual TLS posture", () => {
+  const auditor = new ConfigAuditor({
+    sources: createDefaultConfigSources({
+      "mesh-network": () => ({
+        maxPeers: 10,
+        iceTimeoutMs: 5_000,
+        maxMessageSize: 16_384,
+        mtls: {
+          enabled: false,
+          mode: "PERMISSIVE",
+          certificateProvider: "self-signed",
+          identityTrustDomain: "lumina.local",
+          minTlsVersion: "TLSv1.3",
+          peerAuthenticationRequired: true,
+          rotationHours: 24,
+          telemetryRequired: true,
+        },
+      }),
+    }),
+  });
+  const report = auditor.auditService("mesh-network");
+  assert.equal(report.ok, false);
+  assert.ok(report.metrics.criticalCount >= 3);
+  assert.ok(report.findings.some((f) => f.path === "mtls.mode"));
+});
+
 run("ConfigAuditor handles missing source and capture failures", () => {
   const auditor = new ConfigAuditor({
     sources: [],

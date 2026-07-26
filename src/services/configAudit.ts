@@ -20,14 +20,21 @@ import {
   type RuntimeConfigSnapshot,
   type ServiceBaseline,
 } from "../lib/config";
+import { meshMtlsPolicySnapshot, validateMeshMtlsPolicy } from "../lib/serviceMesh/mtls";
 
 function snapshotForDiff(
   service: string,
   actual: RuntimeConfigSnapshot,
 ): RuntimeConfigSnapshot {
-  if (service !== "deployment") return actual;
-  // channel is allowlist-checked separately; exclude from value diff
-  const { channel: _channel, ...rest } = actual;
+  const rest = { ...actual };
+  if (service === "deployment") {
+    // channel is allowlist-checked separately; exclude from value diff
+    delete rest.channel;
+  }
+  if (service === "mesh-network") {
+    // mTLS posture is validated semantically so rotation can be a bounded value.
+    delete rest.mtls;
+  }
   return rest;
 }
 
@@ -120,6 +127,7 @@ export function createDefaultConfigSources(
           maxPeers: 10,
           iceTimeoutMs: 5_000,
           maxMessageSize: 16_384,
+          ...meshMtlsPolicySnapshot(),
         })),
     },
   ];
@@ -263,6 +271,9 @@ export class ConfigAuditor {
       ...(service === "deployment"
         ? validateDeploymentChannel(snapshot, service)
         : []),
+      ...(service === "mesh-network"
+        ? validateMeshMtlsPolicy(snapshot, service)
+        : []),
     ];
     const durationMs = this.clock() - started;
     const report = this.buildReport(service, findings, durationMs);
@@ -300,6 +311,9 @@ export class ConfigAuditor {
         findings.push(...diffConfigs(baseline, snapshotForDiff(service, actual)));
         if (service === "deployment") {
           findings.push(...validateDeploymentChannel(actual, service));
+        }
+        if (service === "mesh-network") {
+          findings.push(...validateMeshMtlsPolicy(actual, service));
         }
       } catch (error) {
         findings.push({
