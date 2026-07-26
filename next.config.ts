@@ -18,6 +18,7 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   turbopack: {},
   // Content-Security-Policy: defence-in-depth against XSS.
   // Only allowlisted tags (b, i, a) survive DOMPurify sanitization;
