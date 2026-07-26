@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { telemetryLogger, type LogSeverity } from "@/src/lib/logging";
 import type { ConfigDriftTelemetryPayload } from "@/src/utils/configDriftTelemetry";
 
 /**
@@ -18,27 +19,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid-payload" }, { status: 400 });
   }
 
-  const level =
+  const level: LogSeverity =
     payload.criticalCount > 0
       ? "error"
       : payload.warningCount > 0
         ? "warn"
         : "info";
 
-  const log =
-    level === "error"
-      ? console.error
-      : level === "warn"
-        ? console.warn
-        : console.info;
-
-  log("Config drift detected", {
-    service: payload.service,
-    channel: payload.channel,
-    findingCount: payload.findingCount,
-    criticalCount: payload.criticalCount,
-    durationMs: payload.durationMs,
-    withinBudget: payload.withinBudget,
+  telemetryLogger[level]("config.drift.detected", {
+    "service.name": payload.service,
+    "deployment.environment.name": payload.channel,
+    "config.finding.count": payload.findingCount,
+    "config.severity.critical": payload.criticalCount,
+    "duration.ms": payload.durationMs,
+    "slo.within_budget": payload.withinBudget,
     reportedAt: payload.reportedAt,
   });
 

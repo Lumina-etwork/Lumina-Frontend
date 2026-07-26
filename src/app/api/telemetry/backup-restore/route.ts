@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { telemetryLogger } from "@/src/lib/logging";
 import type { BackupRestoreTelemetryPayload } from "@/src/lib/backup/types";
 
 /**
@@ -18,24 +19,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid-payload" }, { status: 400 });
   }
 
-  const level =
-    !payload.ok
-      ? "error"
-      : "info";
+  const level = !payload.ok ? "error" : "info";
 
-  const log =
-    level === "error"
-      ? console.error
-      : console.info;
-
-  log("Backup/Restore event", {
-    eventType: payload.eventType,
-    ok: payload.ok,
-    durationMs: payload.durationMs,
-    recordCount: payload.recordCount,
-    totalSizeBytes: payload.totalSizeBytes,
-    deployChannel: payload.deployChannel,
-    error: payload.error,
+  telemetryLogger[level]("backup_restore.event", {
+    "event.category": payload.eventType,
+    "event.outcome": payload.ok ? "success" : "failure",
+    "duration.ms": payload.durationMs,
+    "backup.record.count": payload.recordCount,
+    "backup.size.bytes": payload.totalSizeBytes,
+    "deployment.environment.name": payload.deployChannel,
+    "error.message": payload.error,
     reportedAt: payload.reportedAt,
   });
 
