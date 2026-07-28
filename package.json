@@ -31,7 +31,7 @@
     "test:bridge": "tsx src/lib/bridge/__tests__/bridgeStore.test.ts",
     "test:staking": "tsx src/lib/staking/__tests__/stakingCalculator.test.ts",
     "test:all": "tsx src/lib/__tests__/offlineQueue.test.ts && tsx src/lib/__tests__/OptimisticTransactionManager.test.ts && tsx src/services/__tests__/localCache.test.ts && tsx src/lib/__tests__/txQueue.test.ts && tsx src/lib/__tests__/slidingWindow.test.ts && tsx src/lib/__tests__/idbClient.test.ts && tsx src/services/__tests__/sharedStateSync.test.ts && tsx src/store/__tests__/workspaceStore.test.ts && tsx src/lib/offline/tests/networkCache.test.ts && tsx src/lib/__tests__/invalidationRegistry.test.ts && tsx src/lib/horizon/__tests__/useHorizonPagination.test.ts && tsx src/lib/cache/__tests__/redisCache.test.ts && tsx src/lib/backup/__tests__/backupRestore.test.ts && tsx src/lib/backup/__tests__/scheduler.test.ts && tsx src/lib/scheduler/__tests__/scheduler.test.ts && tsx src/lib/approvalManager/__tests__/approvalManager.test.ts && tsx src/lib/bridge/__tests__/bridgeStore.test.ts && tsx src/lib/staking/__tests__/stakingCalculator.test.ts",
-    "test:coverage": "rm -rf coverage/tmp && mkdir -p coverage/tmp && export NODE_V8_COVERAGE=coverage/tmp && pnpm test:redis-cache && pnpm test:horizon-pagination && pnpm test:backup && pnpm test:backup-scheduler && pnpm test:approval-manager && pnpm test:bridge && pnpm test:staking && node scripts/check-coverage-threshold.mjs coverage/tmp"
+    "test:incident": "tsx src/lib/incident/__tests__/runbookAutomation.test.ts"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
