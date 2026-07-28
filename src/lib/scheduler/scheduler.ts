@@ -4,12 +4,16 @@ import type {
   SchedulerConfig,
   SchedulerEvent,
   SchedulerMetrics,
+  SchedulerEventType,
+  DeadLetterEntry,
+  DeadLetterReason,
   WorkerClaim,
   WorkerIdentity,
 } from "./types"
 import { JobStore } from "./jobStore"
 import { LeaseManager } from "./leaseManager"
 import { SchedulerMetricsCollector } from "./metrics"
+import { DeadLetterQueue } from "./deadLetterQueue"
 
 export type SchedulerListener = (event: SchedulerEvent) => void
 
@@ -23,6 +27,7 @@ export const DEFAULT_CONFIG: SchedulerConfig = {
   queuePollIntervalMs: 1_000,
   maxConcurrentJobs: 10,
   historyRetentionCount: 100,
+  deadLetterRetentionCount: 1_000,
   performanceBudgetMs: 100,
 }
 
@@ -38,6 +43,7 @@ export class DistributedScheduler {
   private jobStore: JobStore
   private leaseManager: LeaseManager
   private metrics: SchedulerMetricsCollector
+  private deadLetterQueue: DeadLetterQueue
   private listeners = new Set<SchedulerListener>()
   private config: SchedulerConfig
   private eventHistory: SchedulerEvent[] = []
@@ -49,6 +55,7 @@ export class DistributedScheduler {
     this.jobStore = new JobStore()
     this.leaseManager = new LeaseManager(this.jobStore)
     this.metrics = new SchedulerMetricsCollector()
+    this.deadLetterQueue = new DeadLetterQueue({ maxEntries: this.config.deadLetterRetentionCount })
   }
 
   submit(def: JobDefinition): Job {
@@ -90,6 +97,11 @@ export class DistributedScheduler {
   failJob(jobId: string, error: string): void {
     this.jobStore.fail(jobId, error)
     this.metrics.recordFailure()
+    const job = this.jobStore.get(jobId)
+    if (job?.status === "failed") {
+      this.moveToDeadLetter(jobId, "max_retries_exceeded", error)
+      return
+    }
     this.emit("job_failed", { jobId, metadata: { error } })
   }
 
@@ -105,11 +117,43 @@ export class DistributedScheduler {
     return this.jobStore.getAll()
   }
 
+  getDeadLetterQueue(): DeadLetterEntry[] {
+    return this.deadLetterQueue.list()
+  }
+
+  requeueDeadLetter(entryId: string): Job | null {
+    const entry = this.deadLetterQueue.get(entryId)
+    if (!entry) return null
+
+    const job = entry.job
+    this.deadLetterQueue.remove(entryId)
+    this.jobStore.updateStatus(job.jobId, "pending", {
+      error: undefined,
+      completedAt: undefined,
+      claimedBy: undefined,
+      startedAt: undefined,
+      leaseExpiresAt: undefined,
+    })
+    this.emit("job_requeued_from_dead_letter", { jobId: job.jobId, metadata: { entryId } })
+    return this.jobStore.get(job.jobId) ?? null
+  }
+
+  moveToDeadLetter(jobId: string, reason: DeadLetterReason, error?: string): DeadLetterEntry | null {
+    const job = this.jobStore.get(jobId)
+    if (!job) return null
+
+    this.jobStore.updateStatus(jobId, "dead_lettered", { error, completedAt: Date.now() })
+    const deadLettered = this.jobStore.get(jobId)!
+    const entry = this.deadLetterQueue.enqueue(deadLettered, reason, error)
+    this.metrics.recordDeadLetter()
+    this.emit("job_dead_lettered", { jobId, metadata: { entryId: entry.entryId, reason, error } })
+    return entry
+  }
+
   getMetrics(): SchedulerMetrics {
     return this.metrics.getMetrics(
       this.jobStore,
       this.leaseManager,
-      Date.now(),
     )
   }
 
@@ -145,11 +189,17 @@ export class DistributedScheduler {
         const lease = this.leaseManager.getLease(leaseId)
         if (lease) {
           this.jobStore.timeoutExpiredLeases(now, this.config.leaseDurationMs)
+          if (this.jobStore.get(lease.jobId)?.status === "timed_out") {
+            this.moveToDeadLetter(lease.jobId, "lease_expired", "Lease expired")
+          }
           this.emit("lease_expired", { leaseId, jobId: lease.jobId, workerId: lease.workerId })
         }
       }
       const timedOutJobs = this.jobStore.timeoutJobs(now)
       for (const jobId of timedOutJobs) {
+        if (this.jobStore.get(jobId)?.status === "failed") {
+          this.moveToDeadLetter(jobId, "max_retries_exceeded", this.jobStore.get(jobId)?.error)
+        }
         this.emit("job_timed_out", { jobId })
       }
     }
@@ -177,6 +227,7 @@ export class DistributedScheduler {
     this.jobStore.clear()
     this.leaseManager.clear()
     this.metrics.reset()
+    this.deadLetterQueue.clear()
     this.eventHistory = []
     this.listeners.clear()
   }

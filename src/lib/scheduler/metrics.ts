@@ -2,15 +2,11 @@ import type { Job, SchedulerMetrics } from "./types"
 import { SlidingWindow } from "../slidingWindow"
 import { JobStore } from "./jobStore"
 
-interface ProcessingRecord {
-  timestamp: number
-  durationMs: number
-}
-
 export class SchedulerMetricsCollector {
   private completedJobs = 0
   private failedJobs = 0
   private submittedJobs = 0
+  private deadLetteredJobs = 0
   private processingTimes: number[] = []
   private queueTimes: number[] = []
   private throughputWindow: SlidingWindow<{ timestamp: number; value: number }>
@@ -38,7 +34,11 @@ export class SchedulerMetricsCollector {
     this.failedJobs++
   }
 
-  getMetrics(jobStore: JobStore, leaseManager: { getActiveLeaseCount: () => number; getExpiredLeaseCount: () => number; getWorkerCount: () => number }, now: number): SchedulerMetrics {
+  recordDeadLetter(): void {
+    this.deadLetteredJobs++
+  }
+
+  getMetrics(jobStore: JobStore, leaseManager: { getActiveLeaseCount: () => number; getExpiredLeaseCount: () => number; getWorkerCount: () => number }): SchedulerMetrics {
     const sortedProcessing = [...this.processingTimes].sort((a, b) => a - b)
     const sortedQueue = [...this.queueTimes].sort((a, b) => a - b)
 
@@ -59,6 +59,7 @@ export class SchedulerMetricsCollector {
       totalJobsSubmitted: this.submittedJobs,
       totalJobsCompleted: this.completedJobs,
       totalJobsFailed: this.failedJobs,
+      deadLetteredJobs: this.deadLetteredJobs,
       activeLeases: leaseManager.getActiveLeaseCount(),
       expiredLeases: leaseManager.getExpiredLeaseCount(),
       averageQueueTimeMs: Math.round(avgQueue),
@@ -73,6 +74,7 @@ export class SchedulerMetricsCollector {
     this.completedJobs = 0
     this.failedJobs = 0
     this.submittedJobs = 0
+    this.deadLetteredJobs = 0
     this.processingTimes = []
     this.queueTimes = []
     this.throughputWindow.clear()
