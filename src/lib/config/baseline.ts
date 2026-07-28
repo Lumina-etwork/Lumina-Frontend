@@ -5,7 +5,7 @@
 
 import type { DeploymentChannel, RuntimeConfigSnapshot } from "./types";
 
-export const BASELINE_VERSION = "2026.07.16";
+export const BASELINE_VERSION = "2026.07.25";
 
 export interface ServiceBaseline {
   service: string;
@@ -65,8 +65,15 @@ export const DEPLOYMENT_BASELINE: ServiceBaseline = {
 /** Mesh / network defaults used across dashboard services. */
 export const MESH_BASELINE: ServiceBaseline = {
   service: "mesh-network",
-  criticalPaths: [],
-  warningPaths: ["maxPeers", "iceTimeoutMs"],
+  criticalPaths: [
+    "mtls.enabled",
+    "mtls.mode",
+    "mtls.certificateProvider",
+    "mtls.identityTrustDomain",
+    "mtls.minTlsVersion",
+    "mtls.peerAuthenticationRequired",
+  ],
+  warningPaths: ["maxPeers", "iceTimeoutMs", "mtls.rotationHours", "mtls.telemetryRequired"],
   expected: {
     maxPeers: 10,
     iceTimeoutMs: 5_000,

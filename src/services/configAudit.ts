@@ -19,20 +19,22 @@ import {
   type DriftFinding,
   type RuntimeConfigSnapshot,
   type ServiceBaseline,
-  DEFAULT_CONFIG_SCHEMAS,
-  validateConfigSchema,
-  type ConfigSchema,
 } from "../lib/config";
+import { meshMtlsPolicySnapshot, validateMeshMtlsPolicy } from "../lib/serviceMesh/mtls";
 
 function snapshotForDiff(
   service: string,
   actual: RuntimeConfigSnapshot,
 ): RuntimeConfigSnapshot {
-  if (service !== "deployment") return actual;
-  // channel is allowlist-checked separately; exclude from value diff
   const rest = { ...actual };
-  delete rest.channel;
-  delete rest.canaryPercent;
+  if (service === "deployment") {
+    // channel is allowlist-checked separately; exclude from value diff
+    delete rest.channel;
+  }
+  if (service === "mesh-network") {
+    // mTLS posture is validated semantically so rotation can be a bounded value.
+    delete rest.mtls;
+  }
   return rest;
 }
 
@@ -71,7 +73,6 @@ export type AuditListener = (report: AuditReport) => void;
 export interface ConfigAuditOptions {
   sources?: ConfigSource[];
   baselines?: ServiceBaseline[];
-  schemas?: ConfigSchema[];
   channel?: DeploymentChannel;
   now?: () => number;
   /** Override performance.now for deterministic tests. */
@@ -126,6 +127,7 @@ export function createDefaultConfigSources(
           maxPeers: 10,
           iceTimeoutMs: 5_000,
           maxMessageSize: 16_384,
+          ...meshMtlsPolicySnapshot(),
         })),
     },
   ];
@@ -136,7 +138,6 @@ export function createDefaultConfigSources(
 export class ConfigAuditor {
   private sources: Map<string, ConfigSource>;
   private baselines: Map<string, ServiceBaseline>;
-  private schemas: Map<string, ConfigSchema>;
   private listeners = new Set<AuditListener>();
   private history: AuditReport[] = [];
   private channel: DeploymentChannel;
@@ -154,12 +155,6 @@ export class ConfigAuditor {
     );
     this.baselines = new Map(
       (options.baselines ?? ALL_BASELINES).map((b) => [b.service, b]),
-    );
-    this.schemas = new Map(
-      (options.schemas ?? DEFAULT_CONFIG_SCHEMAS).map((schema) => [
-        schema.service,
-        schema,
-      ]),
     );
     this.channel = options.channel ?? "stable";
     this.now = options.now ?? (() => Date.now());
@@ -180,10 +175,6 @@ export class ConfigAuditor {
 
   setBaseline(baseline: ServiceBaseline): void {
     this.baselines.set(baseline.service, baseline);
-  }
-
-  setSchema(schema: ConfigSchema): void {
-    this.schemas.set(schema.service, schema);
   }
 
   setChannel(channel: DeploymentChannel): void {
@@ -275,12 +266,13 @@ export class ConfigAuditor {
     }
 
     const snapshot = actual ?? {};
-    const schema = this.schemas.get(service);
     const findings = [
-      ...(schema ? validateConfigSchema(schema, snapshot) : []),
       ...diffConfigs(baseline, snapshotForDiff(service, snapshot)),
       ...(service === "deployment"
         ? validateDeploymentChannel(snapshot, service)
+        : []),
+      ...(service === "mesh-network"
+        ? validateMeshMtlsPolicy(snapshot, service)
         : []),
     ];
     const durationMs = this.clock() - started;
@@ -316,15 +308,12 @@ export class ConfigAuditor {
 
       try {
         const actual = source.capture() ?? {};
-        const schema = this.schemas.get(service);
-        if (schema) {
-          findings.push(...validateConfigSchema(schema, actual));
-        }
-        findings.push(
-          ...diffConfigs(baseline, snapshotForDiff(service, actual)),
-        );
+        findings.push(...diffConfigs(baseline, snapshotForDiff(service, actual)));
         if (service === "deployment") {
           findings.push(...validateDeploymentChannel(actual, service));
+        }
+        if (service === "mesh-network") {
+          findings.push(...validateMeshMtlsPolicy(actual, service));
         }
       } catch (error) {
         findings.push({
@@ -353,12 +342,8 @@ export class ConfigAuditor {
     findings: DriftFinding[],
     durationMs: number,
   ): AuditReport {
-    const criticalCount = findings.filter(
-      (f) => f.severity === "critical",
-    ).length;
-    const warningCount = findings.filter(
-      (f) => f.severity === "warning",
-    ).length;
+    const criticalCount = findings.filter((f) => f.severity === "critical").length;
+    const warningCount = findings.filter((f) => f.severity === "warning").length;
     const infoCount = findings.filter((f) => f.severity === "info").length;
 
     return {

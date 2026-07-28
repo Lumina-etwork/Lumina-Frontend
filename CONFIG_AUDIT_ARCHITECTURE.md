@@ -8,7 +8,8 @@ Lumina Frontend now includes a system-wide runtime configuration auditor that:
 - diffs each snapshot against a versioned baseline,
 - emits redacted drift findings to operators and telemetry,
 - enforces a **&lt;100ms P99** budget on critical audit paths,
-- supports **blue-green** release slots and **canary** promotion analysis.
+- supports **blue-green** release slots and **canary** promotion analysis,
+- validates service mesh **mutual TLS (mTLS)** posture before promotion.
 
 ## Architecture
 
@@ -39,6 +40,7 @@ Lumina Frontend now includes a system-wide runtime configuration auditor that:
 |------|------|
 | `src/lib/config/types.ts` | Shared types, performance budget, sensitive path fragments |
 | `src/lib/config/baseline.ts` | Versioned expected state per service |
+| `src/lib/serviceMesh/mtls.ts` | Required STRICT mTLS policy and synchronous validators |
 | `src/lib/config/diff.ts` | Flatten + compare engine |
 | `src/lib/config/redact.ts` | Secret redaction before logs / alerts |
 | `src/lib/config/canary.ts` | Blue-green / canary promotion analysis |
@@ -54,6 +56,19 @@ Lumina Frontend now includes a system-wide runtime configuration auditor that:
 - Budget: `PERFORMANCE_BUDGET_MS = 100`.
 - Each report includes `metrics.durationMs` and `metrics.withinBudget`.
 - Audits must not perform network I/O on the critical path; telemetry is async and fire-and-forget.
+
+## Service Mesh mTLS
+
+The `mesh-network` baseline requires STRICT mutual TLS for all service-to-service traffic:
+
+- mTLS must be enabled with `mode=STRICT`.
+- Certificates must come from the configured SPIFFE-compatible CA (`spiffe-ca`).
+- Workload identities must use the `lumina.local` trust domain.
+- Peer authentication and TLS 1.3 are mandatory.
+- Certificate rotation must occur every 24 hours or less.
+- Telemetry must be enabled so alerts and dashboards can see policy drift.
+
+Critical mTLS drift blocks canary promotion; stale rotation or telemetry gaps are warnings that require follow-up before stable rollout.
 
 ## Security
 

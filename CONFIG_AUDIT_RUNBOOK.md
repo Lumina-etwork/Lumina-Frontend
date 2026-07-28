@@ -11,6 +11,7 @@ Operator procedures for runtime configuration drift detection, alerting, and blu
 | Drift findings | `POST /api/telemetry/config-drift` + dashboard | `criticalCount > 0` |
 | Audit latency | `metrics.durationMs` / `withinBudget` | P99 ≥ 100ms |
 | Canary hold | `analyzeCanary()` reason | `promote === false` after min samples |
+| Mesh mTLS posture | `mesh-network` audit findings | Any `mtls.*` critical drift |
 
 ### Dashboard
 
@@ -35,9 +36,20 @@ Wire log drains (CloudWatch, Datadog, etc.) to these messages for paging.
 1. Open `/dashboard/config-audit` and click **Run audit**.
 2. For each **critical** finding:
    - confirm whether the live value is intentional (emergency override) or accidental.
-   - if accidental, restore the baseline value (RPC URL, passphrase, deploy channel).
+   - if accidental, restore the baseline value (RPC URL, passphrase, deploy channel, or mTLS policy).
 3. For **warning** findings, schedule a baseline update or config fix within the next change window.
 4. Confirm `withinBudget` is true; if not, reduce registered source work (no network in `capture()`).
+
+## Service mesh mTLS validation
+
+Before expanding traffic to a new slot or canary:
+
+1. Confirm the service mesh control plane reports `mtls.enabled=true` and `mtls.mode=STRICT`.
+2. Verify identities are issued by `spiffe-ca` in the `lumina.local` trust domain.
+3. Confirm peer authentication is required and minimum TLS is `TLSv1.3`.
+4. Check certificate rotation is no more than 24 hours.
+5. Ensure telemetry remains enabled so `mtls.*` findings reach the dashboard and alert pipeline.
+6. Treat any critical `mtls.*` finding as a promotion blocker.
 
 ## Blue-green deployment
 
