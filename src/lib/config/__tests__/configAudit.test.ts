@@ -13,6 +13,11 @@ import {
   redactSnapshot,
   redactValue,
   SOROBAN_BASELINE,
+  DEFAULT_CONFIG_SCHEMAS,
+  applyHotReloadUpdate,
+  getHotReloadState,
+  resetHotReloadStateForTests,
+  validateConfigSchema,
   type AuditReport,
   type DeploymentChannel,
   type RuntimeConfigSnapshot,
@@ -217,66 +222,69 @@ run("ConfigAuditor handles null capture results as empty snapshot", () => {
   assert.ok(report.findings.length >= 2);
 });
 
-run("ConfigAuditor history is bounded and canary analysis gates promotion", () => {
-  const empty = new ConfigAuditor({
-    sources: createDefaultConfigSources(),
-    channel: "canary",
-    historyLimit: 3,
-  });
-  const early = empty.analyzeCanaryPromotion();
-  assert.equal(early.promote, false);
-  assert.match(early.reason, /Insufficient samples/);
+run(
+  "ConfigAuditor history is bounded and canary analysis gates promotion",
+  () => {
+    const empty = new ConfigAuditor({
+      sources: createDefaultConfigSources(),
+      channel: "canary",
+      historyLimit: 3,
+    });
+    const early = empty.analyzeCanaryPromotion();
+    assert.equal(early.promote, false);
+    assert.match(early.reason, /Insufficient samples/);
 
-  const auditor = new ConfigAuditor({
-    sources: createDefaultConfigSources(),
-    channel: "canary",
-    historyLimit: 3,
-    now: () => 3_000,
-  });
+    const auditor = new ConfigAuditor({
+      sources: createDefaultConfigSources(),
+      channel: "canary",
+      historyLimit: 3,
+      now: () => 3_000,
+    });
 
-  for (let i = 0; i < 5; i += 1) {
-    auditor.auditAll();
-  }
-  assert.equal(auditor.getHistory().length, 3);
+    for (let i = 0; i < 5; i += 1) {
+      auditor.auditAll();
+    }
+    assert.equal(auditor.getHistory().length, 3);
 
-  // Seed enough clean canary samples via history by constructing reports
-  const cleanReports: AuditReport[] = Array.from(
-    { length: CANARY_MIN_SAMPLES },
-    (_, index) => ({
-      ok: true,
-      findings: [],
-      metrics: {
-        durationMs: 1,
-        withinBudget: true,
-        findingCount: 0,
-        criticalCount: 0,
-        warningCount: 0,
-        infoCount: 0,
-        auditedAt: index,
-      },
-      baselineVersion: "test",
-      channel: "canary" as DeploymentChannel,
-      service: "*",
-    }),
-  );
-  const promote = analyzeCanary(cleanReports, "canary");
-  assert.equal(promote.promote, true);
+    // Seed enough clean canary samples via history by constructing reports
+    const cleanReports: AuditReport[] = Array.from(
+      { length: CANARY_MIN_SAMPLES },
+      (_, index) => ({
+        ok: true,
+        findings: [],
+        metrics: {
+          durationMs: 1,
+          withinBudget: true,
+          findingCount: 0,
+          criticalCount: 0,
+          warningCount: 0,
+          infoCount: 0,
+          auditedAt: index,
+        },
+        baselineVersion: "test",
+        channel: "canary" as DeploymentChannel,
+        service: "*",
+      }),
+    );
+    const promote = analyzeCanary(cleanReports, "canary");
+    assert.equal(promote.promote, true);
 
-  const drifted = analyzeCanary(
-    cleanReports.map((r, i) =>
-      i === 0
-        ? {
-            ...r,
-            ok: false,
-            metrics: { ...r.metrics, findingCount: 1, criticalCount: 1 },
-          }
-        : r,
-    ),
-    "canary",
-  );
-  assert.equal(drifted.promote, false);
-  assert.match(drifted.reason, /Critical drift/);
-});
+    const drifted = analyzeCanary(
+      cleanReports.map((r, i) =>
+        i === 0
+          ? {
+              ...r,
+              ok: false,
+              metrics: { ...r.metrics, findingCount: 1, criticalCount: 1 },
+            }
+          : r,
+      ),
+      "canary",
+    );
+    assert.equal(drifted.promote, false);
+    assert.match(drifted.reason, /Critical drift/);
+  },
+);
 
 run("analyzeCanary rejects high non-critical drift rate", () => {
   const reports: AuditReport[] = Array.from({ length: 4 }, (_, index) => ({
@@ -318,6 +326,112 @@ run("unregisterSource removes a service from later audits", () => {
     ),
   );
 });
+
+run("validateConfigSchema enforces required fields and bounds", () => {
+  const findings = validateConfigSchema(
+    {
+      service: "deployment",
+      rules: [
+        {
+          path: "channel",
+          type: "string",
+          required: true,
+          allowedValues: ["stable", "canary"],
+        },
+        {
+          path: "canaryPercent",
+          type: "number",
+          min: 0,
+          max: 100,
+          severity: "warning",
+        },
+      ],
+    },
+    { channel: "shadow", canaryPercent: 150 },
+  );
+  assert.equal(findings.length, 2);
+  assert.ok(
+    findings.some((f) => f.path === "channel" && f.severity === "critical"),
+  );
+  assert.ok(
+    findings.some(
+      (f) => f.path === "canaryPercent" && f.severity === "warning",
+    ),
+  );
+});
+
+run("ConfigAuditor blocks schema-invalid hot reload values", () => {
+  const auditor = new ConfigAuditor({ sources: createDefaultConfigSources() });
+  const report = auditor.auditService("deployment");
+  assert.equal(report.ok, true);
+
+  auditor.registerSource({
+    service: "deployment",
+    capture: () => ({
+      channel: "canary",
+      releaseSlot: "blue",
+      canaryPercent: 150,
+    }),
+  });
+
+  const invalid = auditor.auditService("deployment");
+  assert.equal(invalid.ok, false);
+  assert.ok(invalid.findings.some((f) => f.path === "canaryPercent"));
+});
+
+run("applyHotReloadUpdate accepts valid updates and tracks state", () => {
+  resetHotReloadStateForTests();
+  const auditor = new ConfigAuditor({ sources: createDefaultConfigSources() });
+  const result = applyHotReloadUpdate(
+    {
+      service: "deployment",
+      version: "v2",
+      receivedAt: 42,
+      snapshot: { channel: "canary", releaseSlot: "blue", canaryPercent: 10 },
+    },
+    DEFAULT_CONFIG_SCHEMAS.find((s) => s.service === "deployment"),
+    (_service, snapshot) => {
+      auditor.registerSource({
+        service: "deployment",
+        capture: () => snapshot,
+      });
+      return auditor.auditService("deployment");
+    },
+  );
+
+  assert.equal(result.accepted, true);
+  assert.equal(getHotReloadState("deployment").lastVersion, "v2");
+  assert.equal(getHotReloadState("deployment").acceptedReloads, 1);
+});
+
+run(
+  "applyHotReloadUpdate rejects critical schema failures before promotion",
+  () => {
+    resetHotReloadStateForTests();
+    const auditor = new ConfigAuditor({
+      sources: createDefaultConfigSources(),
+    });
+    const result = applyHotReloadUpdate(
+      {
+        service: "deployment",
+        version: "bad",
+        snapshot: { channel: "shadow", releaseSlot: "blue" },
+      },
+      DEFAULT_CONFIG_SCHEMAS.find((s) => s.service === "deployment"),
+      (_service, snapshot) => {
+        auditor.registerSource({
+          service: "deployment",
+          capture: () => snapshot,
+        });
+        return auditor.auditService("deployment");
+      },
+    );
+
+    assert.equal(result.accepted, false);
+    assert.equal(getHotReloadState("deployment").lastVersion, null);
+    assert.equal(getHotReloadState("deployment").rejectedReloads, 1);
+  },
+);
 
 if (failures > 0) {
   console.error(`\n${failures} test(s) failed`);
