@@ -35,6 +35,16 @@ The app audits live service configuration against versioned baselines, detects d
 
 See `CONFIG_AUDIT_ARCHITECTURE.md` and `CONFIG_AUDIT_RUNBOOK.md`.
 
+## Chaos Engineering in Staging
+
+Staging chaos experiments are validated before blue-green or canary promotion.
+
+* Critical user paths must remain below <100ms P99.
+* Staging availability must stay at or above 99.99%.
+* Experiments require security review, blast-radius controls, monitoring, and rollback ownership.
+
+See `CHAOS_ENGINEERING_BLUEPRINT.md` and `src/lib/chaos/policy.ts`.
+
 ## Getting Started
 
 ### Prerequisites
