@@ -1,7 +1,10 @@
+"use client";
+
 import React, { useState } from 'react';
 import { useKeyboardCommander } from '../../hooks/useKeyboardCommander';
 import { ShortcutCheatsheet } from '../../components/keyboard/ShortcutCheatsheet';
 import { ShortcutConfigPanel } from '../../components/keyboard/ShortcutConfigPanel';
+import { OneTimeLinkGenerator } from '../../components/share/OneTimeLinkGenerator';
 
   const SettingsPage: React.FC = () => {
   const [cheatsheetOpen, setCheatsheetOpen] = useState(false);
@@ -26,6 +29,18 @@ import { ShortcutConfigPanel } from '../../components/keyboard/ShortcutConfigPan
       </div>
 
       <ShortcutConfigPanel />
+
+      <OneTimeLinkGenerator />
+
+      <button
+        type="button"
+        className="rounded-md border border-danger-text px-4 py-2 text-sm font-semibold text-danger-text transition hover:bg-danger-text hover:text-white"
+        onClick={async () => {
+          await fetch('/api/share/revoke-all', { method: 'POST' });
+        }}
+      >
+        Revoke All Shared Links
+      </button>
 
       <ShortcutCheatsheet 
         isOpen={cheatsheetOpen} 
