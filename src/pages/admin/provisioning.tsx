@@ -22,7 +22,7 @@ export default function ProvisioningConsole() {
   } = useBluetoothProvisioning();
 
     useEffect(() => {
-      if (isConnected && step === 'verify' && notifyChar) {
+      if (isConnected && notifyChar) {
        const handleNotification = async (event: Event) => {
          const value = (event.target as any as BluetoothRemoteGATTCharacteristic).value;
          if (value) {
@@ -47,7 +47,7 @@ export default function ProvisioningConsole() {
           notifyChar.stopNotifications().catch(() => {});
         };
       }
-    }, [isConnected, step, notifyChar]);
+    }, [isConnected, notifyChar]);
 
   const handleConnect = async () => {
     try {
@@ -60,6 +60,7 @@ export default function ProvisioningConsole() {
   };
 
   const handleWriteSuccess = () => {
+    setVerificationResult(null);
     setStep('verify');
   };
 
@@ -95,14 +96,14 @@ export default function ProvisioningConsole() {
             <span className="text-xs mt-2 capitalize">{s}</span>
           </div>
         ))}
-        <div className="absolute top-5 left-0 w-full h-0.5 bg-surface-alt -z-0"></div>
+        <div className="absolute top-5 left-0 w-full h-0.5 bg-surface-alt z-0"></div>
         <div 
-          className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-300 -z-0" 
+          className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-300 z-0"
           style={{ width: step === 'scan' ? '0%' : step === 'configure' ? '33.3%' : '66.6%' }}
         ></div>
       </div>
 
-      <main className="bg-surface border rounded-xl p-6 shadow-sm min-h-[400px]">
+      <main className="bg-surface border rounded-xl p-6 shadow-sm min-h-100">
         {step === 'scan' && (
           <div className="flex flex-col items-center justify-center h-full py-20">
             <div className="text-center mb-8">

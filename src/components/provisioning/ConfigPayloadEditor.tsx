@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { encodeConfig } from '../../lib/bluetooth/provisioningProtocol';
+import { BLE_WRITE_CHUNK_SIZE, encodeConfig } from '../../lib/bluetooth/provisioningProtocol';
 
 interface ConfigPayloadEditorProps {
   writeCharacteristic: BluetoothRemoteGATTCharacteristic | null;
@@ -14,6 +14,7 @@ export const ConfigPayloadEditor: React.FC<ConfigPayloadEditorProps> = ({
 }) => {
   const [configText, setConfigText] = useState('{\n  "nodeId": "node-01",\n  "interval": 60\n}');
   const [isWriting, setIsWriting] = useState(false);
+  const [writeError, setWriteError] = useState<string | null>(null);
 
   const handleWrite = async () => {
     if (!writeCharacteristic) {
@@ -22,15 +23,15 @@ export const ConfigPayloadEditor: React.FC<ConfigPayloadEditorProps> = ({
     }
 
     setIsWriting(true);
+    setWriteError(null);
     try {
       const configObj = JSON.parse(configText);
       const data = encodeConfig(configObj);
       
-      const chunkSize = 512;
-      for (let i = 0; i < data.length; i += chunkSize) {
-        const chunk = data.slice(i, i + chunkSize);
+      for (let i = 0; i < data.length; i += BLE_WRITE_CHUNK_SIZE) {
+        const chunk = data.slice(i, i + BLE_WRITE_CHUNK_SIZE);
         await writeCharacteristic.writeValue(chunk);
-        if (i + chunkSize < data.length) {
+        if (i + BLE_WRITE_CHUNK_SIZE < data.length) {
           await new Promise(resolve => setTimeout(resolve, 20));
         }
       }
@@ -38,6 +39,7 @@ export const ConfigPayloadEditor: React.FC<ConfigPayloadEditorProps> = ({
       onWriteSuccess();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to write configuration';
+      setWriteError(message);
       onWriteError(message);
     } finally {
       setIsWriting(false);
@@ -48,11 +50,13 @@ export const ConfigPayloadEditor: React.FC<ConfigPayloadEditorProps> = ({
     <div className="flex flex-col gap-4 p-4 border rounded-lg bg-gray-50">
       <label className="text-sm font-medium text-gray-700">Node Configuration (JSON)</label>
       <textarea
+        aria-label="Node configuration JSON"
         className="w-full h-64 p-2 font-mono text-sm border rounded"
         value={configText}
         onChange={(e) => setConfigText(e.target.value)}
         disabled={isWriting}
       />
+      {writeError && <p role="alert" className="text-sm text-red-600">{writeError}</p>}
       <button
         onClick={handleWrite}
         disabled={isWriting || !writeCharacteristic}
