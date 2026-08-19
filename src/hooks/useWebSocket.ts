@@ -66,6 +66,7 @@ export function useWebSocket<T = unknown>(
   const messageQueueRef = useRef<string[]>([])
   const isMountedRef = useRef(true)
   const isManualCloseRef = useRef(false)
+  const connectionReadyRef = useRef(false) // Dedup flag to prevent multiple onopen events
 
   // Calculate exponential backoff delay
   const getReconnectDelay = useCallback((attempt: number): number => {
@@ -88,6 +89,14 @@ export function useWebSocket<T = unknown>(
       ws.onopen = () => {
         if (!isMountedRef.current) return
         
+        // Dedup: ignore duplicate onopen events (e.g., Firefox browser retry logic)
+        // Set flag on first onopen, subsequent onopen events are ignored
+        if (connectionReadyRef.current === true) {
+          console.warn('[useWebSocket] Ignoring duplicate onopen event')
+          return
+        }
+        
+        connectionReadyRef.current = true
         setState('connected')
         setReconnectAttempts(0)
 
@@ -127,9 +136,11 @@ export function useWebSocket<T = unknown>(
       ws.onclose = () => {
         if (!isMountedRef.current || isManualCloseRef.current) {
           setState('disconnected')
+          connectionReadyRef.current = false
           return
         }
 
+        connectionReadyRef.current = false
         setState('disconnected')
 
         // Attempt reconnection if enabled
