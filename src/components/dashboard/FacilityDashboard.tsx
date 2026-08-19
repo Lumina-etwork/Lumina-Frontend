@@ -233,54 +233,58 @@ export function FacilityDashboard() {
         <div className="dashboard-grid py-6">
           <section className="dashboard-grid-cell">
             <h2 className="sr-only">Node List</h2>
-            {nodesSkeleton.showSkeleton ? (
-              <>
-                {nodesSkeleton.timedOut && (
-                  <div className="skeleton-timeout">
-                    <span>Taking longer than expected</span>
-                  </div>
-                )}
-                <NodeSectionSkeleton />
-              </>
-            ) : (
-              <div className="skeleton-fade-active">
-                {viewMode === "list" ? (
-                  <NodeList nodes={nodesData ?? []} maxDisplay={10} />
-                ) : (
-                  <div className="h-[600px]">
-                    {hierarchicalData ? (
-                      <TreeView
-                        data={hierarchicalData}
-                        width={960}
-                        height={600}
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-muted">
-                        No hierarchical data available
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="card-content">
+              {nodesSkeleton.showSkeleton ? (
+                <>
+                  {nodesSkeleton.timedOut && (
+                    <div className="skeleton-timeout">
+                      <span>Taking longer than expected</span>
+                    </div>
+                  )}
+                  <NodeSectionSkeleton />
+                </>
+              ) : (
+                <div className="skeleton-fade-active">
+                  {viewMode === "list" ? (
+                    <NodeList nodes={nodesData ?? []} maxDisplay={10} />
+                  ) : (
+                    <div className="h-150">
+                      {hierarchicalData ? (
+                        <TreeView
+                          data={hierarchicalData}
+                          width={960}
+                          height={600}
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-muted">
+                          No hierarchical data available
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </section>
 
           <section className="dashboard-grid-cell">
             <h2 className="sr-only">Alerts</h2>
-            {alertsSkeleton.showSkeleton ? (
-              <>
-                {alertsSkeleton.timedOut && (
-                  <div className="skeleton-timeout">
-                    <span>Taking longer than expected</span>
-                  </div>
-                )}
-                <AlertSectionSkeleton />
-              </>
-            ) : (
-              <div className="skeleton-fade-active">
-                <AlertFeed />
-              </div>
-            )}
+            <div className="card-content">
+              {alertsSkeleton.showSkeleton ? (
+                <>
+                  {alertsSkeleton.timedOut && (
+                    <div className="skeleton-timeout">
+                      <span>Taking longer than expected</span>
+                    </div>
+                  )}
+                  <AlertSectionSkeleton />
+                </>
+              ) : (
+                <div className="skeleton-fade-active">
+                  <AlertFeed />
+                </div>
+              )}
+            </div>
           </section>
         </div>
 

@@ -7,7 +7,9 @@
 
 .dashboard-grid-cell {
   container-type: inline-size;
+  container-name: dashboard-cell;
   min-width: 280px;
+  min-inline-size: 280px;
 }
 
 
@@ -15,7 +17,7 @@
   display: grid;
   gap: 16px;
   grid-template-columns: 1fr;
-  min-width: 280px;
+  min-inline-size: 280px;
   overflow-x: auto;
 }
 
