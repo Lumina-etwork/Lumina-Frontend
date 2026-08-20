@@ -1,7 +1,9 @@
+
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useBandwidthStream, type BandwidthDataPoint } from '../../hooks/useBandwidthStream'
+import { BandwidthFrameQueue } from '../../utils/telemetry/bandwidthFrameQueue'
 import { drawBandwidthChart } from './chart/d3Renderer'
 
 export interface BandwidthChartProps {
@@ -20,207 +22,136 @@ export function BandwidthChart({
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const workerRef = useRef<Worker | null>(null)
+  const mainThreadDataRef = useRef<BandwidthDataPoint[]>([])
+  const mainThreadQueueRef = useRef(new BandwidthFrameQueue())
+
   const [dimensions, setDimensions] = useState({ width: 400, height })
   const [useWorker, setUseWorker] = useState(false)
   const [connectionState, setConnectionState] = useState<'connecting' | 'connected' | 'disconnected'>('connecting')
-
-  // Main thread fallback state
-  const mainThreadDataRef = useRef<BandwidthDataPoint[]>([])
-  const mainThreadArrivalTimestamps = useRef<number[]>([])
   const [mainThreadDecimated, setMainThreadDecimated] = useState(false)
+  const [stats, setStats] = useState({ current: 0, average: 0, peak: 0, pointsCount: 0 })
 
-  // Statistics
-  const [stats, setStats] = useState({
-    current: 0,
-    average: 0,
-    peak: 0,
-    pointsCount: 0,
-  })
-
-  // Update statistics
   const updateStats = useCallback((newData: BandwidthDataPoint[]) => {
     if (newData.length === 0) return
     const values = newData.map((d) => d.value)
-    const current = values[values.length - 1]
-    const average = values.reduce((sum, v) => sum + v, 0) / values.length
-    const peak = Math.max(...values)
     setStats({
-      current,
-      average,
-      peak,
+      current: values[values.length - 1],
+      average: values.reduce((sum, value) => sum + value, 0) / values.length,
+      peak: Math.max(...values),
       pointsCount: newData.length,
     })
   }, [])
 
-  // Handle incoming data
-  const handleDataPoint = useCallback(
-    (point: BandwidthDataPoint) => {
-      if (workerRef.current && useWorker) {
-        // Send to worker
-        workerRef.current.postMessage({
-          type: 'data',
-          data: point,
-        })
+  const appendVisibleFrames = useCallback((frames: BandwidthDataPoint[]) => {
+    const data = mainThreadDataRef.current
+    frames.forEach((frame) => {
+      if (!data.some((point) => point.timestamp === frame.timestamp)) data.push(frame)
+    })
+    data.sort((a, b) => a.timestamp - b.timestamp)
+    while (data.length > 300) data.shift()
+    updateStats(data)
+  }, [updateStats])
 
-        // Also track locally just for stats calculation (throttled/non-blocking)
-        const localData = mainThreadDataRef.current
-        const exists = localData.some((d) => d.timestamp === point.timestamp)
-        if (!exists) {
-          localData.push(point)
-          if (localData.length > 300) localData.shift()
-        }
-        updateStats(localData)
-      } else {
-        // Fallback main thread rendering
-        const localData = mainThreadDataRef.current
-        const exists = localData.some((d) => d.timestamp === point.timestamp)
-        if (!exists) {
-          localData.push(point)
-          if (localData.length > 300) localData.shift()
-        }
-
-        // Measure event rate on main thread to decide decimation
-        const now = Date.now()
-        mainThreadArrivalTimestamps.current.push(now)
-        mainThreadArrivalTimestamps.current = mainThreadArrivalTimestamps.current.filter((t) => now - t < 1000)
-        const rate = mainThreadArrivalTimestamps.current.length
-
-        let decimated = mainThreadDecimated
-        if (rate > 10) {
-          decimated = true
-        } else if (rate < 5) {
-          decimated = false
-        }
-        setMainThreadDecimated(decimated)
-
-        updateStats(localData)
-
-        // Draw immediately on main thread canvas
-        const canvas = canvasRef.current
-        if (canvas) {
-          const ctx = canvas.getContext('2d')
-          if (ctx) {
-            drawBandwidthChart(ctx, localData, dimensions.width, dimensions.height, decimated)
-          }
-        }
-      }
-    },
-    [useWorker, dimensions, updateStats, mainThreadDecimated]
-  )
-
-  // Connect to WebSocket stream
-  const ws = useBandwidthStream({
-    wsUrl,
-    onMessage: handleDataPoint,
-  })
-
-  // Sync connection state
-  useEffect(() => {
-    if (ws.state === 'connected') {
-      setConnectionState('connected')
-    } else if (ws.state === 'connecting') {
-      setConnectionState('connecting')
-    } else {
-      setConnectionState('disconnected')
+  const handleDataPoint = useCallback((point: BandwidthDataPoint) => {
+    if (workerRef.current && useWorker) {
+      workerRef.current.postMessage({ type: 'data', data: point })
+      appendVisibleFrames([point])
+      return
     }
+
+    mainThreadQueueRef.current.enqueue(point)
+  }, [appendVisibleFrames, useWorker])
+
+  const ws = useBandwidthStream({ wsUrl, onMessage: handleDataPoint })
+
+  useEffect(() => {
+    setConnectionState(
+      ws.state === 'connected' ? 'connected' : ws.state === 'connecting' ? 'connecting' : 'disconnected'
+    )
   }, [ws.state])
 
-  // Initialize Worker & Canvas size
   useEffect(() => {
     const container = containerRef.current
     const canvas = canvasRef.current
     if (!container || !canvas) return
 
-    // Get exact container dimensions
     const rect = container.getBoundingClientRect()
     const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1
-    const w = rect.width || 400
-    const h = height
+    const width = rect.width || 400
+    setDimensions({ width, height })
 
-    setDimensions({ width: w, height: h })
-
-    // Check OffscreenCanvas support
     const supportsOffscreen = typeof HTMLCanvasElement.prototype.transferControlToOffscreen === 'function'
-
     if (supportsOffscreen && !workerRef.current) {
       try {
-        const worker = new Worker(
-          new URL('../../workers/bandwidthWorker.ts', import.meta.url),
-          { type: 'module' }
-        )
-
-        canvas.width = w * dpr
-        canvas.height = h * dpr
-
+        const worker = new Worker(new URL('../../workers/bandwidthWorker.ts', import.meta.url), { type: 'module' })
+        canvas.width = width * dpr
+        canvas.height = height * dpr
         const offscreen = canvas.transferControlToOffscreen()
-        worker.postMessage(
-          {
-            type: 'init',
-            canvas: offscreen,
-            width: w * dpr,
-            height: h * dpr,
-          },
-          [offscreen]
-        )
-
+        worker.postMessage({ type: 'init', canvas: offscreen, width: width * dpr, height: height * dpr }, [offscreen])
         workerRef.current = worker
         setUseWorker(true)
-      } catch (err) {
-        console.warn('Failed to initialize OffscreenCanvas worker, falling back to main thread:', err)
+      } catch (error) {
+        console.warn('Failed to initialize OffscreenCanvas worker, falling back to main thread:', error)
         setUseWorker(false)
       }
-    } else if (!supportsOffscreen) {
-      setUseWorker(false)
     }
 
-    // Handle resize
     const handleResize = () => {
       if (!containerRef.current) return
-      const newRect = containerRef.current.getBoundingClientRect()
-      const newW = newRect.width || 400
+      const nextWidth = containerRef.current.getBoundingClientRect().width || 400
+      setDimensions({ width: nextWidth, height })
 
-      setDimensions({ width: newW, height: h })
-
-      if (workerRef.current && useWorker) {
-        workerRef.current.postMessage({
-          type: 'resize',
-          width: newW * dpr,
-          height: h * dpr,
-        })
+      if (workerRef.current) {
+        workerRef.current.postMessage({ type: 'resize', width: nextWidth * dpr, height: height * dpr })
       } else if (canvasRef.current) {
-        canvasRef.current.width = newW * dpr
-        canvasRef.current.height = h * dpr
-        const ctx = canvasRef.current.getContext('2d')
-        if (ctx) {
-          drawBandwidthChart(ctx, mainThreadDataRef.current, newW, h, mainThreadDecimated)
-        }
+        canvasRef.current.width = nextWidth * dpr
+        canvasRef.current.height = height * dpr
       }
     }
 
     window.addEventListener('resize', handleResize)
     return () => {
       window.removeEventListener('resize', handleResize)
-      if (workerRef.current) {
-        workerRef.current.terminate()
-        workerRef.current = null
-      }
+      workerRef.current?.terminate()
+      workerRef.current = null
+      mainThreadQueueRef.current.clear()
     }
-  }, [height, useWorker])
+  }, [height])
 
-  // Trigger main thread draw if dimensions change in fallback mode
   useEffect(() => {
-    if (!useWorker && canvasRef.current) {
-      const canvas = canvasRef.current
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        drawBandwidthChart(ctx, mainThreadDataRef.current, dimensions.width, dimensions.height, mainThreadDecimated)
+    if (useWorker) return
+
+    let frameId = 0
+    const renderFrame = () => {
+      const drained = mainThreadQueueRef.current.drain()
+      if (drained.frames.length > 0) {
+        appendVisibleFrames(drained.frames)
+        setMainThreadDecimated(drained.catchUp)
+
+        const canvas = canvasRef.current
+        const ctx = canvas?.getContext('2d')
+        if (ctx) {
+          drawBandwidthChart(
+            ctx,
+            mainThreadDataRef.current,
+            dimensions.width,
+            dimensions.height,
+            drained.catchUp
+          )
+        }
+      } else if (mainThreadQueueRef.current.size === 0 && mainThreadDecimated) {
+        setMainThreadDecimated(false)
       }
+
+      frameId = requestAnimationFrame(renderFrame)
     }
-  }, [dimensions, useWorker, mainThreadDecimated])
+
+    frameId = requestAnimationFrame(renderFrame)
+    return () => cancelAnimationFrame(frameId)
+  }, [appendVisibleFrames, dimensions, mainThreadDecimated, useWorker])
 
   return (
     <div ref={containerRef} className="rounded-lg border border-border bg-surface p-4">
-      {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-foreground">{title}</h3>
@@ -238,6 +169,11 @@ export function BandwidthChart({
               {connectionState === 'connected' ? 'Live' : connectionState === 'connecting' ? 'Connecting' : 'Disconnected'}
             </span>
             <span>{stats.pointsCount} / 300 points</span>
+            {mainThreadDecimated && !useWorker && (
+              <span className="text-[10px] bg-surface-alt text-muted px-1.5 py-0.5 rounded font-mono">
+                Catching up
+              </span>
+            )}
             {enablePerformanceTracking && (
               <span className="text-[10px] bg-surface-alt text-muted px-1.5 py-0.5 rounded font-mono">
                 {useWorker ? 'Worker Offscreen' : 'Main Thread Fallback'}
@@ -247,46 +183,25 @@ export function BandwidthChart({
         </div>
       </div>
 
-      {/* Rendering Surface */}
       <div style={{ position: 'relative', width: '100%', height: dimensions.height }}>
-        <canvas
-          ref={canvasRef}
-          style={{
-            display: 'block',
-            width: '100%',
-            height: '100%',
-          }}
-        />
+        <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
       </div>
 
-      {/* Stats footer */}
       {stats.pointsCount > 0 && (
         <div className="mt-4 grid grid-cols-3 gap-4 border-t border-table-divider pt-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-              Current
-            </p>
-            <p className="mt-1 text-lg font-semibold text-foreground">
-              {stats.current.toFixed(2)}
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">Current</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">{stats.current.toFixed(2)}</p>
             <p className="text-xs text-muted">Mb/s</p>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-              Average
-            </p>
-            <p className="mt-1 text-lg font-semibold text-foreground">
-              {stats.average.toFixed(2)}
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">Average</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">{stats.average.toFixed(2)}</p>
             <p className="text-xs text-muted">Mb/s</p>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-              Peak
-            </p>
-            <p className="mt-1 text-lg font-semibold text-foreground">
-              {stats.peak.toFixed(2)}
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">Peak</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">{stats.peak.toFixed(2)}</p>
             <p className="text-xs text-muted">Mb/s</p>
           </div>
         </div>
