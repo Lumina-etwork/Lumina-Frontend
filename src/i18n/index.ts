@@ -5,7 +5,8 @@ export { useTranslation } from "./useTranslation";
 export { IntlNumber } from "./IntlNumber";
 export { IntlDate } from "./IntlDate";
 export { LocaleSwitcher } from "./LocaleSwitcher";
-export type { Locale, TranslationMap } from "./types";
+import type { Locale, TranslationMap } from "./types";
+export type { Locale, TranslationMap };
 
 export const RTL_LOCALES: ReadonlySet<Locale> = new Set(["ar-SA", "he-IL"]);
 
