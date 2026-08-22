@@ -23,5 +23,5 @@ export function getTTLForGroup(group: string, customConfig?: TTLConfig): number 
 }
 
 export function mergeTTLConfig(overrides: Partial<TTLConfig>): TTLConfig {
-  return { ...DEFAULT_TTL_CONFIG, ...overrides };
+  return { ...DEFAULT_TTL_CONFIG, ...overrides } as TTLConfig;
 }

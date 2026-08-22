@@ -41,9 +41,9 @@ export async function parseToken(token: string, serverSecret: string): Promise<S
 
     const key = await deriveKey(serverSecret);
     const plaintext = await crypto.subtle.decrypt(
-      { name: "AES-GCM", iv: fromBase64Url(nonce) },
+      { name: "AES-GCM", iv: fromBase64Url(nonce) as any },
       key,
-      fromBase64Url(ciphertext),
+      fromBase64Url(ciphertext) as any,
     );
     const payload = JSON.parse(decoder.decode(plaintext)) as SharePayload;
     if (

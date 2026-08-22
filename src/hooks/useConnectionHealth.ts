@@ -141,8 +141,8 @@ export function useConnectionHealth(config: HealthCheckConfig) {
         // Reschedule for next ping
         nextPingTimeRef.current = now + pingIntervalMs
         healthCheckTimeoutRef.current = setTimeout(() => {
-          if (currentGeneration === timerGenerationRef.current && isMountedRef.current && ws) {
-            performHealthCheck(currentGeneration)
+          if (generation === timerGenerationRef.current && isMountedRef.current && ws) {
+            performHealthCheck(generation)
           }
         }, pingIntervalMs)
       } else {
