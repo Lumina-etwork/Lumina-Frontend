@@ -42,14 +42,14 @@ interface TransactionDetailProps {
 
 export function TransactionDetail({ transaction, onRetry, onClose }: TransactionDetailProps) {
   const entries: TimelineEntry[] = STATUS_STEPS.map((step, idx) => {
-    const timestampKey = {
+    const timestampKey = ({
       Initiated: "initiatedAt",
       SourceConfirmed: "sourceConfirmedAt",
       BridgeRelayed: "bridgeRelayedAt",
       DestinationPending: "destinationPendingAt",
       DestinationConfirmed: "destinationConfirmedAt",
       Complete: "completedAt",
-    }[step.status] as keyof BridgeTransaction;
+    } as Record<string, string>)[step.status] as keyof BridgeTransaction;
 
     const ts = transaction[timestampKey] as number | undefined;
     const isFailed = transaction.status === "Failed";

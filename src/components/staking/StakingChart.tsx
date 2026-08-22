@@ -82,7 +82,7 @@ export function StakingChart({ data, loading }: StakingChartProps) {
                 borderRadius: "6px",
                 fontSize: "12px",
               }}
-              formatter={(value: number) => [
+              formatter={(value: any) => [
                 `${value.toLocaleString()} LUM`,
                 "Balance",
               ]}
