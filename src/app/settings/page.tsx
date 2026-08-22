@@ -1,4 +1,4 @@
-import SettingsPage from "@/src/legacy-pages/settings/SettingsPage";
+import SettingsPage from "@/src/old_pages/settings/SettingsPage";
 
 export default function SettingsRoute() {
   return <SettingsPage />;
