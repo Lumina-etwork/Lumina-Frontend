@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "icons": "node scripts/generate-pwa-icons.mjs",
     "prebuild": "node scripts/generate-pwa-icons.mjs",
+    "test": "jest",
     "test:unit": "tsx src/lib/__tests__/offlineQueue.test.ts && tsx src/utils/telemetry/__tests__/bandwidthFrameQueue.test.ts",
     "test:bandwidth-stream": "tsx src/utils/telemetry/__tests__/bandwidthFrameQueue.test.ts",
     "test:optimistic": "tsx src/lib/__tests__/OptimisticTransactionManager.test.ts",
