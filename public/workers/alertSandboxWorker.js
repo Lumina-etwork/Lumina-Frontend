@@ -12,7 +12,7 @@
  *  - Timeout is enforced by the main thread via worker.terminate()
  */
 
-/* eslint-disable no-restricted-globals */
+ 
 
 /**
  * Freeze common global references so scripts cannot mutate the worker

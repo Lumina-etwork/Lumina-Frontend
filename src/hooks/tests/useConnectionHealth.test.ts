@@ -17,19 +17,19 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 // Mock WebSocket
 class MockWebSocket {
   readyState = WebSocket.OPEN
-  listeners: Record<string, Function[]> = {
+  listeners: Record<string, ((...args: unknown[]) => void)[]> = {
     error: [],
     close: [],
   }
 
-  addEventListener(event: string, callback: Function) {
+  addEventListener(event: string, callback: (...args: unknown[]) => void) {
     if (!this.listeners[event]) {
       this.listeners[event] = []
     }
     this.listeners[event].push(callback)
   }
 
-  removeEventListener(event: string, callback: Function) {
+  removeEventListener(event: string, callback: (...args: unknown[]) => void) {
     if (!this.listeners[event]) return
     this.listeners[event] = this.listeners[event].filter((cb) => cb !== callback)
   }
@@ -53,7 +53,7 @@ class MockWebSocket {
 
 describe('useConnectionHealth', () => {
   let ws: MockWebSocket
-  let onHealthChange: ReturnType<typeof vi.fn>
+  let onHealthChange: () => void
 
   beforeEach(() => {
     ws = new MockWebSocket()

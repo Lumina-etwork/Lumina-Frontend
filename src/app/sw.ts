@@ -31,7 +31,7 @@ interface FileSystemCreateWritableOptions {
 }
 
 interface FileSystemWritableFileStream extends WritableStream {
-  write(data: any): Promise<void>;
+  write(data: unknown): Promise<void>;
   seek(position: number): Promise<void>;
   truncate(size: number): Promise<void>;
   close(): Promise<void>;

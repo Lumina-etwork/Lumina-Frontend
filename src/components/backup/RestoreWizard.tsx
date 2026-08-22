@@ -19,8 +19,8 @@ export function RestoreWizard() {
   const { uploadAndRestore, runRestoreTest } = useBackupRestore();
   const [step, setStep] = useState<RestoreStep["id"]>("select");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [verifyResult, setVerifyResult] = useState<any>(null);
-  const [restoreResult, setRestoreResult] = useState<any>(null);
+  const [verifyResult, setVerifyResult] = useState<unknown>(null);
+  const [restoreResult, setRestoreResult] = useState<unknown>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

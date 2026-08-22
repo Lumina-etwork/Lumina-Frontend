@@ -9,7 +9,7 @@ interface ApiPlaygroundProps {
 }
 
 export function ApiPlayground({ apiKey }: ApiPlaygroundProps) {
-  const [spec, setSpec] = useState<any>(null);
+  const [spec, setSpec] = useState<unknown>(null);
 
   useEffect(() => {
     // Mock OpenAPI spec - in production, this would be fetched from the API

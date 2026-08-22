@@ -16,7 +16,7 @@ interface ApiKey {
 }
 
 // In-memory storage (in production, use a database)
-let apiKeys: ApiKey[] = [
+const apiKeys: ApiKey[] = [
   {
     id: "1",
     name: "Development Key",

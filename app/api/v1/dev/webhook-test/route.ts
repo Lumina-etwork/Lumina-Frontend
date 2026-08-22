@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // In-memory storage for received webhooks (in production, use a database or message queue)
-let receivedWebhooks: any[] = [];
+let receivedWebhooks: unknown[] = [];
 
 // POST /api/v1/dev/webhook-test - Test endpoint for receiving webhooks
 export async function POST(request: NextRequest) {

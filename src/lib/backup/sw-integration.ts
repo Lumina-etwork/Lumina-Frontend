@@ -24,7 +24,7 @@ export async function registerPeriodicSync(
   // Try the Periodic Sync API first
   if ("periodicSync" in swRegistration) {
     try {
-      const ps = (swRegistration as any).periodicSync as {
+      const ps = (swRegistration as unknown).periodicSync as {
         register: (tag: string, options: { minInterval: number }) => Promise<void>;
         unregister: (tag: string) => Promise<void>;
         getTags: () => Promise<string[]>;
@@ -57,7 +57,7 @@ export async function unregisterPeriodicSync(
 ): Promise<void> {
   if ("periodicSync" in swRegistration) {
     try {
-      const ps = (swRegistration as any).periodicSync as {
+      const ps = (swRegistration as unknown).periodicSync as {
         unregister: (tag: string) => Promise<void>;
       };
       await ps.unregister("backup-db");

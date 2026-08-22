@@ -153,7 +153,7 @@ export async function rollbackRestore(
   const start = performance.now();
   const stores: StoreResult[] = [];
   let totalRecordsRestored = 0;
-  let anyFailed = false;
+  const anyFailed = false;
 
   for (const [dbName, storesData] of Object.entries(snapshot)) {
     const dbResults = await importDatabase(dbName, storesData, true);

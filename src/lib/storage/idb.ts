@@ -401,7 +401,7 @@ export async function flushSyncQueue(): Promise<SyncFlushResult> {
 /**
  * Wrapper to match hook signature for saving node configuration
  */
-export async function saveToIndexedDB(key: string, data: any): Promise<void> {
+export async function saveToIndexedDB(key: string, data: unknown): Promise<void> {
   // We use the nodeConfigSnapshots store. The key matches the nodeId.
   await saveNodeConfigSnapshot({
     nodeId: key,
@@ -414,7 +414,7 @@ export async function saveToIndexedDB(key: string, data: any): Promise<void> {
 /**
  * Wrapper to match hook signature for loading node configuration
  */
-export async function loadFromIndexedDB(key: string): Promise<any | null> {
+export async function loadFromIndexedDB(key: string): Promise<unknown | null> {
   const snapshots = await getNodeConfigSnapshots(key);
   if (snapshots.length === 0) return null;
   

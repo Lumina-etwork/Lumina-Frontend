@@ -20,7 +20,7 @@ export function useBandwidthStream({
   enabled = true,
 }: UseBandwidthStreamProps) {
   const handleMessage = useCallback(
-    (data: any) => {
+    (data: unknown) => {
       if (!enabled) return
       // Support nested value/timestamp or direct format
       if (data && typeof data.value === 'number' && typeof data.timestamp === 'number') {
@@ -43,14 +43,14 @@ export function useBandwidthStream({
     ? { url: 'ws://mock', reconnect: false }
     : { url: wsUrl, reconnect: true }
 
-  const ws = useWebSocket<any>(wsConfig, isMock ? () => {} : handleMessage)
+  const ws = useWebSocket<unknown>(wsConfig, isMock ? () => {} : handleMessage)
 
   // Listen for simulated/mock messages
   useEffect(() => {
     if (!isMock) return
 
     const handleMockEvent = (e: Event) => {
-      const customEvent = e as CustomEvent<any>
+      const customEvent = e as CustomEvent<unknown>
       if (Array.isArray(customEvent.detail)) {
         // Handle burst of points
         customEvent.detail.forEach((pt) => handleMessage(pt))

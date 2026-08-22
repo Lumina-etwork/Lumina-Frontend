@@ -10,7 +10,7 @@ interface WebhookData {
   id: string;
   timestamp: string;
   headers: Record<string, string>;
-  body: any;
+  body: unknown;
   method: string;
   url: string;
 }

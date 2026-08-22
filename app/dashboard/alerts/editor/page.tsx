@@ -9,8 +9,9 @@
  */
 
 import React from 'react';
-import { AlertRuleEditor } from '../../../src/pages/alerts/AlertRuleEditor';
-import '../../../src/styles/alertRuleEditor.css';
+import { AlertRuleEditor } from '@/src/pages/alerts/AlertRuleEditor';
+import type { AlertRuleDefinition } from '@/src/hooks/useAlertRuleMutation';
+import '@/src/styles/alertRuleEditor.css';
 
 export default function AlertsEditorPage() {
   return (
@@ -23,7 +24,7 @@ export default function AlertsEditorPage() {
       }}
     >
       <AlertRuleEditor
-        onSaved={(rule) => {
+        onSaved={(rule: AlertRuleDefinition) => {
           // In a real app this would navigate back to the alert rules list.
           // For now, log the saved rule.
           console.log('[AlertRuleEditor] Rule saved:', rule);

@@ -52,7 +52,7 @@ export class OptimisticTransactionManager {
     const startTime = performance.now();
 
     // Apply the balance delta immediately
-    this.queryClient.setQueryData(queryKey, (old: any) => {
+    this.queryClient.setQueryData(queryKey, (old: unknown) => {
       if (!old) return old;
 
       const newBalance =
@@ -187,7 +187,7 @@ export class OptimisticTransactionManager {
       
       // For each snapshot, check if it should be rolled back
       for (const snapshot of snapshots) {
-        this.queryClient.setQueryData(snapshot.queryKey, (current: any) => {
+        this.queryClient.setQueryData(snapshot.queryKey, (current: unknown) => {
           if (!current) return current;
 
           // If current balance doesn't match backend, use backend value

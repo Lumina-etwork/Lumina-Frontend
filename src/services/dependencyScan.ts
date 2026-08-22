@@ -37,8 +37,8 @@ export function createDefaultPackageSources(): PackageSource[] {
       parse: () => {
         if (cache.deps) return { dependencies: cache.deps };
         try {
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          const pkg = require("../../package.json");
+           
+          import pkg from "../../package.json";
           cache.deps = parsePackageJson(pkg);
           return { dependencies: cache.deps };
         } catch {

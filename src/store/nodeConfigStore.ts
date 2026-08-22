@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 
 interface NodeConfigState {
-  editingConfig: Record<string, any> | null;
+  editingConfig: Record<string, unknown> | null;
   isEditorOpen: boolean;
-  startEditing: (initialConfig: Record<string, any>) => void;
-  updateField: (key: string, value: any) => void;
+  startEditing: (initialConfig: Record<string, unknown>) => void;
+  updateField: (key: string, value: unknown) => void;
   clearEditor: () => void;
 }
 

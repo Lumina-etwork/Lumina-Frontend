@@ -17,7 +17,7 @@ let isDecimated = false
 
 const localRaf = typeof requestAnimationFrame !== 'undefined'
   ? requestAnimationFrame
-  : (cb: (...args: any[]) => void) => setTimeout(cb, 16)
+  : (cb: (...args: unknown[]) => void) => setTimeout(cb, 16)
 
 function appendFrames(frames: BandwidthDataPoint[]) {
   frames.forEach((pt) => {
