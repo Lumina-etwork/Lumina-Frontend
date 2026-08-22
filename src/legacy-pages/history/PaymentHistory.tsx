@@ -113,7 +113,7 @@ function RecordRow({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function PaymentHistory({ accountId }: PaymentHistoryProps) {
+export default function PaymentHistory({ accountId }: PaymentHistoryProps) {
   const {
     records,
     pageIndex,

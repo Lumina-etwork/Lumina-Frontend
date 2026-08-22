@@ -405,7 +405,7 @@ export async function saveToIndexedDB(key: string, data: unknown): Promise<void>
   // We use the nodeConfigSnapshots store. The key matches the nodeId.
   await saveNodeConfigSnapshot({
     nodeId: key,
-    config: data,
+    config: data as Record<string, unknown>,
     version: 1,
     snapshotAt: new Date().toISOString()
   });

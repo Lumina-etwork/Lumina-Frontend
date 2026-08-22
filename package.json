@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "icons": "node scripts/generate-pwa-icons.mjs",
     "prebuild": "node scripts/generate-pwa-icons.mjs",
+    "test": "jest",
     "test:unit": "tsx src/lib/__tests__/offlineQueue.test.ts && tsx src/utils/telemetry/__tests__/bandwidthFrameQueue.test.ts",
     "test:bandwidth-stream": "tsx src/utils/telemetry/__tests__/bandwidthFrameQueue.test.ts",
     "test:optimistic": "tsx src/lib/__tests__/OptimisticTransactionManager.test.ts",
@@ -53,14 +54,15 @@
     "react-dom": "19.2.3",
     "recharts": "^3.8.1",
     "serwist": "^9.5.11",
+    "swagger-ui-react": "^5.32.14",
     "tailwind-merge": "^3.6.0",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.0",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/react": "^16.3.2",
     "@types/d3": "^7.4.3",
-    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.2.17",
@@ -69,10 +71,11 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "fake-indexeddb": "^6.2.5",
-    "jest": "^30.4.2",
+    "monaco-editor": "^0.56.0",
+    "sharp": "^0.35.3",
     "tailwindcss": "^4",
-    "ts-jest": "^29.4.11",
     "tsx": "^4.22.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   }
 }

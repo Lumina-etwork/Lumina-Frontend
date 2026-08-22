@@ -227,7 +227,7 @@ export function AuditReportPage() {
           </div>
         ) : !data ? (
           <div className="py-20 text-center border border-dashed border-[#d8d0c1] rounded-xl text-[#6f5f48]">
-            Please enter a date range and click "Generate Report".
+            Please enter a date range and click &quot;Generate Report&quot;.
           </div>
         ) : (
           <div>

@@ -4,7 +4,8 @@ import { useWorkspaceStore } from '../store/workspaceStore'
  * Higher-order function/callback guard that checks the active organization's
  * permission bitfield mask before allowing mutations.
  */
-export function withOrgScope<T extends (...args: unknown[]) => unknown>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function withOrgScope<T extends (...args: any[]) => any>(
   permissionBit: number,
   callback: T,
   onAccessDenied?: (msg: string) => void

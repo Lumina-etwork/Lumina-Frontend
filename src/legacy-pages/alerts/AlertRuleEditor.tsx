@@ -55,7 +55,7 @@ export interface AlertRuleEditorProps {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function AlertRuleEditor({
+export default function AlertRuleEditor({
   existingRule,
   onSaved,
 }: AlertRuleEditorProps) {
