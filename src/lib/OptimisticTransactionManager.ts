@@ -46,7 +46,7 @@ export class OptimisticTransactionManager {
   applyOptimisticUpdate(
     queryKey: unknown[],
     delta: BalanceDelta,
-    previousData: unknown
+    previousData: unknown // eslint-disable-line @typescript-eslint/no-unused-vars
   ): string {
     const nonce = generateIdempotencyKey();
     const startTime = performance.now();

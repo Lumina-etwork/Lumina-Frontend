@@ -34,7 +34,7 @@ class MockWebSocket {
     this.listeners[event] = this.listeners[event].filter((cb) => cb !== callback)
   }
 
-  send(message: string) {
+  send(message: string) { // eslint-disable-line @typescript-eslint/no-unused-vars
     // Mock send
   }
 
@@ -132,7 +132,7 @@ describe('useConnectionHealth', () => {
 
     // Advance to just before expected ping
     vi.advanceTimersByTime(9990 - 10)
-    lastPingTime = Date.now()
+    lastPingTime = Date.now() // eslint-disable-line @typescript-eslint/no-unused-vars
 
     // Advance to the actual expected ping time
     vi.advanceTimersByTime(10)

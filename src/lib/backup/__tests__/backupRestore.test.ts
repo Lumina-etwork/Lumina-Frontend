@@ -1,11 +1,11 @@
 import "fake-indexeddb/auto";
 import assert from "node:assert/strict";
 import {
-  BackupRestoreManager,
+  BackupRestoreManager, // eslint-disable-line @typescript-eslint/no-unused-vars
   resetBackupRestoreManagerForTests,
   getBackupRestoreManager,
   BACKUP_SCHEMA_VERSION,
-  PERFORMANCE_BUDGET_MS,
+  PERFORMANCE_BUDGET_MS, // eslint-disable-line @typescript-eslint/no-unused-vars
 } from "../index";
 import {
   validateManifest,
@@ -16,7 +16,7 @@ import {
 } from "../verify";
 import {
   exportDatabase,
-  importDatabase,
+  importDatabase, // eslint-disable-line @typescript-eslint/no-unused-vars
   saveMetadata,
   getMetadataList,
   removeMetadata,

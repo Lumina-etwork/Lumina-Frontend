@@ -5,7 +5,7 @@ import type {
   BackupEvent,
   BackupEventType,
   BackupScheduleConfig,
-  BackupFrequency,
+  BackupFrequency, // eslint-disable-line @typescript-eslint/no-unused-vars
   BackupDatabases,
   RestoreReport,
   VerifyReport,
@@ -13,12 +13,12 @@ import type {
 import { BACKUP_SCHEMA_VERSION } from "./types";
 import {
   exportDatabase,
-  importDatabase,
+  importDatabase, // eslint-disable-line @typescript-eslint/no-unused-vars
   saveMetadata,
   getMetadataList,
   removeMetadata,
   clearAllMetadata,
-  countDatabaseRecords,
+  countDatabaseRecords, // eslint-disable-line @typescript-eslint/no-unused-vars
   getKnownDbNames,
 } from "./storage";
 import { computeChecksum, verifyBackup } from "./verify";

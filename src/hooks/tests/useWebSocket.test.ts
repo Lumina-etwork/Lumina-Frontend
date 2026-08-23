@@ -36,7 +36,7 @@ class MockWebSocket {
     this.protocols = protocols
   }
 
-  send(data: string) {
+  send(data: string) { // eslint-disable-line @typescript-eslint/no-unused-vars
     if (this.readyState !== MockWebSocket.OPEN) {
       throw new Error('WebSocket is not open')
     }

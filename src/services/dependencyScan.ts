@@ -143,7 +143,7 @@ export class DependencyScanner {
     try {
       const parsed = source.parse();
       deps = parsed.dependencies;
-    } catch (error) {
+    } catch (error) { // eslint-disable-line @typescript-eslint/no-unused-vars
       const durationMs = this.clock() - started;
       const report: ScanReport = {
         ok: false,

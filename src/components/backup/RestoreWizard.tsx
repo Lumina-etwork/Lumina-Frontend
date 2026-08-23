@@ -55,7 +55,7 @@ export function RestoreWizard() {
 
     try {
       const text = await selectedFile.text();
-      const backup = JSON.parse(text);
+      const backup = JSON.parse(text); // eslint-disable-line @typescript-eslint/no-unused-vars
       const result = await uploadAndRestore(selectedFile, false);
       setRestoreResult(result);
       if (result?.ok) {

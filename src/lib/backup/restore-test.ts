@@ -3,7 +3,7 @@ import { verifyBackup } from "./verify";
 import {
   exportDatabase,
   importDatabase,
-  countDatabaseRecords,
+  countDatabaseRecords, // eslint-disable-line @typescript-eslint/no-unused-vars
 } from "./storage";
 
 /**
