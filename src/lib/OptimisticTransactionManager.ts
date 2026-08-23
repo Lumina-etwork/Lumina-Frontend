@@ -57,8 +57,8 @@ export class OptimisticTransactionManager {
 
       const newBalance =
         delta.operation === "deposit"
-          ? (old as { rawBalance: number }).rawBalance + delta.amount
-          : (old as { rawBalance: number }).rawBalance - delta.amount;
+          ? Number((old as { rawBalance: number }).rawBalance) + Number(delta.amount)
+          : Number((old as { rawBalance: number }).rawBalance) - Number(delta.amount);
 
       return {
         ...old,

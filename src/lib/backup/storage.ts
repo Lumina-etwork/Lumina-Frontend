@@ -315,9 +315,9 @@ export async function countDatabaseRecords(
   let db: IDBPDatabase<unknown> | null = null;
   try {
     if (dbName === "lumina-field-db") {
-      db = await getFieldDbPromise();
+      db = (await getFieldDbPromise()) as unknown as IDBPDatabase<unknown>;
     } else if (dbName === "lumina-offline-queue") {
-      db = await getOfflineDbPromise();
+      db = (await getOfflineDbPromise()) as unknown as IDBPDatabase<unknown>;
     }
     if (!db) return 0;
 
