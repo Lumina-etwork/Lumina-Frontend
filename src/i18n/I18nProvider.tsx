@@ -9,34 +9,94 @@ import {
   useState,
 } from "react";
 import type { Locale, TranslationMap } from "./types";
+import { SUPPORTED_LOCALES, RTL_LOCALES } from "./index";
 
 const STORAGE_KEY = "lumina-locale";
 const DEFAULT_LOCALE: Locale = "en-US";
 
-function getStoredLocale(): Locale {
-  if (typeof window === "undefined") return DEFAULT_LOCALE;
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && isSupportedLocale(stored)) return stored as Locale;
-  } catch {}
+export function isSupportedLocale(locale: string): locale is Locale {
+  return (SUPPORTED_LOCALES as string[]).includes(locale);
+}
+
+export function detectBrowserLocale(
+  navigatorObj?: Partial<Navigator>
+): Locale | null {
+  const nav =
+    navigatorObj || (typeof navigator !== "undefined" ? navigator : undefined);
+  if (!nav) return null;
+
+  const languages = nav.languages || (nav.language ? [nav.language] : []);
+  for (const lang of languages) {
+    if (!lang) continue;
+    if (isSupportedLocale(lang)) return lang;
+
+    const prefix = lang.split("-")[0].toLowerCase();
+    const match = SUPPORTED_LOCALES.find((loc) =>
+      loc.toLowerCase().startsWith(prefix)
+    );
+    if (match) return match;
+  }
+  return null;
+}
+
+export function resolveLocale(options?: {
+  urlSearch?: string;
+  storedLocale?: string | null;
+  navigatorObj?: Partial<Navigator>;
+}): Locale {
+  const { urlSearch, storedLocale, navigatorObj } = options || {};
+
+  // 1. URL search parameter precedence (locale or lang)
+  if (urlSearch !== undefined) {
+    try {
+      const params = new URLSearchParams(urlSearch);
+      const urlLoc = params.get("locale") || params.get("lang");
+      if (urlLoc && isSupportedLocale(urlLoc)) {
+        return urlLoc;
+      }
+    } catch {}
+  } else if (typeof window !== "undefined") {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlLoc = params.get("locale") || params.get("lang");
+      if (urlLoc && isSupportedLocale(urlLoc)) {
+        return urlLoc;
+      }
+    } catch {}
+  }
+
+  // 2. Persisted preference in localStorage
+  if (storedLocale !== undefined) {
+    if (storedLocale && isSupportedLocale(storedLocale)) {
+      return storedLocale;
+    }
+  } else if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored && isSupportedLocale(stored)) {
+        return stored as Locale;
+      }
+    } catch {}
+  }
+
+  // 3. Browser detection fallback
+  const detected = detectBrowserLocale(navigatorObj);
+  if (detected) return detected;
+
+  // 4. Default fallback
   return DEFAULT_LOCALE;
 }
 
-function isSupportedLocale(locale: string): locale is Locale {
-  return [
-    "en-US",
-    "zh-CN",
-    "ja-JP",
-    "ko-KR",
-    "ru-RU",
-    "ar-SA",
-    "he-IL",
-    "es-ES",
-    "pt-BR",
-  ].includes(locale);
+export function updateUrlLocale(newLocale: Locale) {
+  if (typeof window === "undefined") return;
+  try {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("locale") !== newLocale) {
+      url.searchParams.set("locale", newLocale);
+      window.history.replaceState(null, "", url.toString());
+    }
+  } catch {}
 }
-
-const RTL_LOCALES = new Set(["ar-SA", "he-IL"]);
 
 interface I18nContextValue {
   locale: Locale;
@@ -54,15 +114,6 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const cacheRef = useRef<Map<string, TranslationMap>>(new Map());
   const mountedRef = useRef(false);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    const initial = getStoredLocale();
-    loadLocale(initial);
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const loadLocale = useCallback(async (loc: Locale) => {
@@ -106,6 +157,28 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  useEffect(() => {
+    mountedRef.current = true;
+    const initial = resolveLocale();
+    setLocaleState(initial);
+    try {
+      localStorage.setItem(STORAGE_KEY, initial);
+    } catch {}
+    updateUrlLocale(initial);
+
+    if (RTL_LOCALES.has(initial)) {
+      document.documentElement.dir = "rtl";
+    } else {
+      document.documentElement.dir = "ltr";
+    }
+    document.documentElement.lang = initial;
+
+    loadLocale(initial);
+    return () => {
+      mountedRef.current = false;
+    };
+  }, [loadLocale]);
+
   const setLocale = useCallback(
     (newLocale: Locale) => {
       setLocaleState(newLocale);
@@ -113,15 +186,18 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       try {
         localStorage.setItem(STORAGE_KEY, newLocale);
       } catch {}
-      loadLocale(newLocale);
+      updateUrlLocale(newLocale);
 
       if (RTL_LOCALES.has(newLocale)) {
         document.documentElement.dir = "rtl";
       } else {
         document.documentElement.dir = "ltr";
       }
+      document.documentElement.lang = newLocale;
+
+      loadLocale(newLocale);
     },
-    [loadLocale],
+    [loadLocale]
   );
 
   const t = useCallback(
@@ -129,7 +205,9 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       let value = translations[key];
       if (value === undefined) {
         if (process.env.NODE_ENV === "development") {
-          console.warn(`[i18n] Missing translation key: "${key}" for locale "${locale}"`);
+          console.warn(
+            `[i18n] Missing translation key: "${key}" for locale "${locale}"`
+          );
         }
         value = key;
       }
@@ -142,7 +220,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
       return value;
     },
-    [translations, locale],
+    [translations, locale]
   );
 
   return (

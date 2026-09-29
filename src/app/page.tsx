@@ -34,9 +34,7 @@ export default function Home() {
               ))}
               <a className="rounded-md border border-border-light bg-surface px-3 py-2 transition hover:border-primary hover:text-primary" href="/pending-tx">Pending</a>
             </nav>
-            <div className="hidden sm:block">
-              <LocaleSwitcher />
-            </div>
+            <LocaleSwitcher />
             <ThemeSelector />
           </div>
         </header>
